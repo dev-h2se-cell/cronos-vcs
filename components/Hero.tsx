@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button } from './Button';
 import { ArrowRight, ShieldCheck, Zap } from 'lucide-react';
-import productImage400 from '../assets/images/chronos-c-shield-400w.jpg';
-import productImage800 from '../assets/images/chronos-c-shield-800w.jpg';
-import productImage from '../assets/images/chronos-c-shield.jpg';
+import productImage400 from '../src/assets/images/chronos-c-shield-400w.jpg';
+import productImage800 from '../src/assets/images/chronos-c-shield-800w.jpg';
+import productImage from '../src/assets/images/chronos-c-shield.jpg';
 
 export const Hero: React.FC = () => {
   const scrollToOffer = () => {
