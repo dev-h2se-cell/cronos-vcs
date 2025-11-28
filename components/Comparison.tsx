@@ -9,7 +9,7 @@ export const Comparison: React.FC = () => {
           <span className="text-orange-600 font-bold tracking-widest text-xs uppercase mb-2 block">El Problema Oculto</span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">La Crisis de la Oxidación</h2>
           <p className="text-slate-600 max-w-2xl mx-auto">
-            La mayoría de los sueros de Vitamina C mueren antes de tocar tu piel. Si tu suero es naranja o huele a metal, ya es tarde.
+            La mayoría de los sueros de Vitamina C mueren antes de tocar tu piel. Si tu suero es cafe o huele a metal, ya es tarde.
           </p>
         </div>
 

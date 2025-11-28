@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { Droplets, ShieldCheck, Zap, Layers, ChevronRight, Check, Sparkles, RefreshCcw, ArrowRight, X } from 'lucide-react';
 
+import hydroLockHero400 from '../src/assets/images/hydro-lock-hero-400w.jpg';
+import hydroLockHero800 from '../src/assets/images/hydro-lock-hero-800w.jpg';
+import hydroLockHero from '../src/assets/images/hydro-lock-hero.jpg';
+
 interface Props {
   onAddToCart: () => void;
 }
@@ -79,30 +83,12 @@ export const HydroLockProductScreen: React.FC<Props> = ({ onAddToCart }) => {
                   
                   {/* Bottle Image - Local Source */}
                   <img 
-                    src="/hydrolock-bottle.jpg" 
-                    onError={(e) => e.currentTarget.style.display = 'none'} // Hide if missing to show backup CSS below
+                    src={hydroLockHero}
+                    srcSet={`${hydroLockHero400} 400w, ${hydroLockHero800} 800w, ${hydroLockHero} 1000w`}
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     alt="Hydro-Lock Serum Bottle"
                     className="relative z-10 w-full h-full object-cover rounded-[3rem] shadow-2xl"
                   />
-
-                  {/* Backup CSS Bottle (Visible if img fails) */}
-                  <div className="relative z-0 w-full h-full bg-white/20 backdrop-blur-xl rounded-[3rem] border border-white/60 shadow-2xl flex flex-col items-center justify-center overflow-hidden absolute inset-0">
-                      {/* Frosted Glass Texture */}
-                      <div className="absolute inset-0 bg-gradient-to-tr from-white/40 to-transparent opacity-50"></div>
-                      
-                      {/* Liquid Inside */}
-                      <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-cyan-50/50 rounded-b-[3rem] backdrop-blur-md"></div>
-                      
-                      {/* Droplets on surface */}
-                      <div className="absolute top-20 right-10 w-3 h-3 bg-white/80 rounded-full shadow-sm border border-white/50"></div>
-                      <div className="absolute top-24 right-8 w-1.5 h-1.5 bg-white/80 rounded-full shadow-sm"></div>
-
-                      <div className="relative z-20 text-center">
-                          <h2 className="text-2xl font-bold text-slate-800 tracking-tighter">HYDRO<br/>LOCK™</h2>
-                          <div className="w-8 h-1 bg-cyan-500 mx-auto my-2 rounded-full"></div>
-                          <p className="text-[10px] uppercase tracking-widest text-slate-500">Serum Hialurónico</p>
-                      </div>
-                  </div>
                </div>
             </div>
          </div>

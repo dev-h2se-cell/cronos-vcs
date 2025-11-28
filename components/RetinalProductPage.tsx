@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { Moon, Sparkles, Check, ChevronRight, BarChart, ArrowRight, ShieldCheck } from 'lucide-react';
 
+import retinalHero400 from '../src/assets/images/retinal-hero-400w.jpg';
+import retinalHero800 from '../src/assets/images/retinal-hero-800w.jpg';
+import retinalHero from '../src/assets/images/retinal-hero.jpg';
+
 interface Props {
   onAddToCart: () => void;
   onNavigateToProtocol: () => void;
@@ -62,21 +66,12 @@ export const RetinalProductPage: React.FC<Props> = ({ onAddToCart, onNavigateToP
                <div className="w-64 h-96 bg-gradient-to-tr from-purple-900/40 to-slate-800 rounded-3xl border border-white/5 relative flex items-center justify-center shadow-[0_0_50px_rgba(168,85,247,0.15)] overflow-hidden">
                   {/* Bottle Image - Local Source */}
                   <img 
-                    src="/retinal-bottle.jpg" 
-                    onError={(e) => e.currentTarget.style.display = 'none'} // Hide if missing to show backup CSS below
+                    src={retinalHero}
+                    srcSet={`${retinalHero400} 400w, ${retinalHero800} 800w, ${retinalHero} 1000w`}
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     alt="Infinity Retinal Night Bottle"
                     className="absolute inset-0 w-full h-full object-cover z-0"
                   />
-                  
-                  {/* Backup CSS Bottle (Visible if img fails) */}
-                  <div className="w-24 h-64 bg-slate-900 rounded-full border border-purple-900/50 relative overflow-hidden flex flex-col items-center z-10 -mb-4">
-                      <div className="w-full h-12 bg-purple-900/20 border-b border-purple-900/50"></div>
-                      <div className="mt-auto mb-8">
-                         <div className="text-[10px] text-purple-400 tracking-[0.2em] font-bold text-center">INFINITY</div>
-                         <div className="text-[8px] text-slate-500 text-center uppercase mt-1">Retinal Night</div>
-                      </div>
-                  </div>
-                  <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-purple-600 rounded-full blur-[60px] opacity-60 z-20"></div>
                </div>
             </div>
          </div>

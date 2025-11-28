@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { Sun, Shield, Layers, Eye, Check, ArrowRight, Zap, RefreshCcw, Sparkles, Hand, Clock, RotateCw } from 'lucide-react';
 
+import invisibleShieldHero400 from '../src/assets/images/invisible-shield-hero-400w.jpg';
+import invisibleShieldHero800 from '../src/assets/images/invisible-shield-hero-800w.jpg';
+import invisibleShieldHero from '../src/assets/images/invisible-shield-hero.jpg';
+
 interface Props {
   onAddToCart: () => void;
 }
@@ -79,8 +83,9 @@ export const InvisibleShieldProductScreen: React.FC<Props> = ({ onAddToCart }) =
                   
                   {/* Tube Image - Local Source */}
                   <img 
-                    src="/shield-tube.jpg" 
-                    onError={(e) => e.currentTarget.style.display = 'none'} // Hide if missing to show backup CSS below
+                    src={invisibleShieldHero}
+                    srcSet={`${invisibleShieldHero400} 400w, ${invisibleShieldHero800} 800w, ${invisibleShieldHero} 1000w`}
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     alt="Invisible Shield SPF Tube"
                     className="relative z-10 w-full h-full object-cover rounded-[2rem] shadow-2xl"
                   />
