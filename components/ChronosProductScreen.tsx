@@ -9,6 +9,9 @@ import { ShopTheRoutine } from './ShopTheRoutine';
 import { Guarantee } from './Guarantee';
 import { FAQ } from './FAQ';
 import { Button } from './Button';
+import chronosHero400 from '../src/assets/images/chronos-c-hero-400w.jpg';
+import chronosHero800 from '../src/assets/images/chronos-c-hero-800w.jpg';
+import chronosHero from '../src/assets/images/chronos-c-hero.jpg';
 
 interface Props {
   onAddToCart: () => void;
@@ -55,7 +58,11 @@ export const ChronosProductScreen: React.FC<Props> = ({ onAddToCart, onNavigateT
 
   return (
     <div className="bg-slate-50 min-h-screen text-slate-900 font-sans animate-fade-in pb-24 relative">
-      <Hero />
+      <Hero 
+        productImage={chronosHero}
+        productImage400={chronosHero400}
+        productImage800={chronosHero800}
+      />
       
       {/* Sticky Tab System - Unified Structure */}
       <div className="sticky top-[60px] md:top-[72px] z-40 bg-white/90 backdrop-blur-md border-y border-slate-200 shadow-sm transition-all duration-300">
