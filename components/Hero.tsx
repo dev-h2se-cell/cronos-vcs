@@ -2,13 +2,23 @@ import React from 'react';
 import { Button } from './Button';
 import { ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 
+// Default Chronos-C Shield images
+import defaultProductImage400 from '../src/assets/images/chronos-c-shield-400w.jpg';
+import defaultProductImage800 from '../src/assets/images/chronos-c-shield-800w.jpg';
+import defaultProductImage from '../src/assets/images/chronos-c-shield.jpg';
+
 interface HeroProps {
-  productImage: string;
-  productImage400: string;
-  productImage800: string;
+  productImage?: string;
+  productImage400?: string;
+  productImage800?: string;
 }
 
 export const Hero: React.FC<HeroProps> = ({ productImage, productImage400, productImage800 }) => {
+  // Use provided props or fall back to default images
+  const _productImage = productImage || defaultProductImage;
+  const _productImage400 = productImage400 || defaultProductImage400;
+  const _productImage800 = productImage800 || defaultProductImage800;
+
   const scrollToOffer = () => {
     const element = document.getElementById('offer');
     if (element) {
@@ -59,8 +69,8 @@ export const Hero: React.FC<HeroProps> = ({ productImage, productImage400, produ
                 
                 {/* Image - Primary Source: Local Public File */}
                 <img 
-                  src={productImage}
-                  srcSet={`${productImage400} 400w, ${productImage800} 800w, ${productImage} 1000w`}
+                  src={_productImage}
+                  srcSet={`${_productImage400} 400w, ${_productImage800} 800w, ${_productImage} 1000w`}
                   sizes="(max-width: 768px) 100vw, 50vw"
                   alt="CHRONOS-C Shield Bottle"
                   width={800}
