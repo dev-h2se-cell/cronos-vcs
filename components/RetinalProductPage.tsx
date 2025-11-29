@@ -79,7 +79,7 @@ export const RetinalProductPage: React.FC<Props> = ({ onAddToCart, onNavigateToP
 
       {/* 3. Sticky Tab System */}
       <div className="sticky top-[60px] md:top-[72px] z-40 bg-slate-950/90 backdrop-blur-md border-y border-white/5">
-         <div className="max-w-7xl mx-auto px-6 flex overflow-x-auto no-scrollbar gap-8 md:gap-12 text-sm font-bold tracking-widest uppercase">
+         <div className="max-w-7xl mx-auto px-6 flex overflow-x-auto no-scrollbar gap-8 md:gap-12 text-sm font-bold tracking-widest uppercase justify-start md:justify-center">
             {['overview', 'science', 'routine', 'offers'].map((tab) => (
                <button
                   key={tab}

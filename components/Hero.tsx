@@ -62,7 +62,7 @@ export const Hero: React.FC<HeroProps> = ({ productImage, productImage400, produ
           
           {/* Product Image Container */}
           <div className="relative z-10 w-full max-w-sm mx-auto group cursor-pointer">
-             <div className="aspect-[4/5] bg-gradient-to-b from-white to-slate-100 rounded-2xl shadow-2xl border border-slate-100 flex items-center justify-center overflow-hidden p-8 relative">
+             <div className="aspect-[4/5] bg-gradient-to-b from-white to-slate-100 rounded-[3rem] shadow-2xl border border-slate-100 flex items-center justify-center overflow-hidden p-8 relative">
                 {/* Tech overlay lines */}
                 <div className="absolute top-8 right-8 w-16 h-[1px] bg-slate-300"></div>
                 <div className="absolute top-8 right-8 h-16 w-[1px] bg-slate-300"></div>
