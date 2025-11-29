@@ -38,7 +38,7 @@ export const Hero: React.FC<HeroProps> = ({ productImage, productImage400, produ
           </div>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
-            La Primera Vitamina C que Mantiene su Potencia del <span className="text-orange-500">Día 1</span> al <span className="text-orange-500">Día 90</span>.
+            La Primera Vitamina C que Mantiene su Potencia de la <span className="text-orange-500">Noche 1</span> a la <span className="text-orange-500">Noche 90</span>.
           </h1>
           
           <p className="text-slate-600 text-lg md:text-xl leading-relaxed max-w-lg">

@@ -72,7 +72,7 @@ export const Comparison: React.FC = () => {
                 </li>
                 <li className="flex items-start gap-3">
                     <Check className="text-orange-500 shrink-0" size={20} />
-                    <span className="text-slate-300 text-sm">Sin olor. Textura de seda.</span>
+                    <span className="text-slate-300 text-sm">Con el olor correcto. Textura de seda.</span>
                 </li>
                 <li className="flex items-start gap-3">
                     <Check className="text-orange-500 shrink-0" size={20} />

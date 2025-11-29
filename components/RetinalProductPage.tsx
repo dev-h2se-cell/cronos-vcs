@@ -231,8 +231,9 @@ export const RetinalProductPage: React.FC<Props> = ({ onAddToCart, onNavigateToP
                   </div>
 
                   <ul className="space-y-3 mb-8 relative z-10">
-                     <li className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-purple-500" /> Chronos-C (Día)</li>
+                     <li className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-purple-500" /> Chronos-C (Noche)</li>
                      <li className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-purple-500" /> Infinity Retinal (Noche)</li>
+                     <li className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-purple-500" /> Dejar 15 min entre aplicaciones</li>
                      <li className="flex items-center gap-2 text-sm text-slate-300"><Check size={16} className="text-purple-500" /> Barrier Lock Cream (Travel)</li>
                      <li className="flex items-center gap-2 text-sm text-purple-300 font-bold"><Sparkles size={16} /> Envío Gratis + Guía PDF</li>
                   </ul>
