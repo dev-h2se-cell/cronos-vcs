@@ -1,0 +1,158 @@
+{
+  "products": [
+    {
+      "id": "chronos-c-shield",
+      "name": "Chronos-C Shield™",
+      "tagline": "El Iniciado",
+      "type": "individual",
+      "price": "110.000",
+      "currency": "COP",
+      "description": "Potente Vitamina C antioxidante.",
+      "longDescription": "Chronos-C neutraliza radicales libres, UV y contaminación. Evita que tu colágeno se degrade durante el día.",
+      "benefits": [
+        "Cero Oxidación",
+        "Brillo Clínico"
+      ],
+      "mobileCtaPrice": "110.000",
+      "image": "/images/chronos-c-hero.jpg",
+      "image400w": "/images/chronos-c-hero-400w.jpg",
+      "image800w": "/images/chronos-c-hero-800w.jpg",
+      "offerImage": "/images/chronos-c-shield.jpg"
+    },
+    {
+      "id": "hydro-lock-serum",
+      "name": "Hydro-Lock Serum",
+      "tagline": "El Hidratante",
+      "type": "individual",
+      "price": "110.000",
+      "currency": "COP",
+      "description": "Hidratación profunda con ácido hialurónico.",
+      "longDescription": "Hidratación profunda y protección total contra los agresores diarios como el sol y la polución.",
+      "benefits": [],
+      "mobileCtaPrice": "110.000",
+      "subscriptionPrice": "99.000",
+      "subscriptionOriginalPrice": "110.000",
+      "image": "/images/hydro-lock-hero.jpg",
+      "image400w": "/images/hydro-lock-hero-400w.jpg",
+      "image800w": "/images/hydro-lock-hero-800w.jpg"
+    },
+    {
+      "id": "invisible-shield-spf",
+      "name": "Invisible Shield SPF 50+",
+      "tagline": "El Escudo",
+      "type": "individual",
+      "price": "110.000",
+      "currency": "COP",
+      "description": "Protección solar invisible de amplio espectro.",
+      "longDescription": "Máxima protección contra UVA/UVB sin residuos blancos. Tubo Airless 80 gramos.",
+      "benefits": [],
+      "mobileCtaPrice": "110.000",
+      "subscriptionPrice": "99.000",
+      "subscriptionOriginalPrice": "110.000",
+      "size": "80 gramos",
+      "image": "/images/invisible-shield-hero.jpg",
+      "image400w": "/images/invisible-shield-hero-400w.jpg",
+      "image800w": "/images/invisible-shield-hero-800w.jpg"
+    },
+    {
+      "id": "infinity-retinal",
+      "name": "Infinity Retinal",
+      "tagline": "La Noche",
+      "type": "individual",
+      "price": "150.000",
+      "currency": "COP",
+      "description": "Renovación celular 11x más rápida que el Retinol.",
+      "longDescription": "Acelera la renovación celular mientras duermes. Repara el daño acumulado y suaviza líneas.",
+      "benefits": [
+        "11x Más Rápido que Retinol"
+      ],
+      "mobileCtaPrice": "150.000",
+      "image": "/images/retinal-hero.jpg",
+      "image400w": "/images/retinal-hero-400w.jpg",
+      "image800w": "/images/retinal-hero-800w.jpg"
+    }
+  ],
+  "protocols": [
+    {
+      "id": "protocolo-dia",
+      "name": "Protocolo Día",
+      "tagline": "Modo Defensa AM",
+      "type": "bundle",
+      "price": "198.000",
+      "originalPrice": "220.000",
+      "currency": "COP",
+      "description": "Hidratación profunda y protección total contra agresores diarios.",
+      "productsIncluded": [
+        "hydro-lock-serum",
+        "invisible-shield-spf"
+      ],
+      "ctaText": "AÑADIR PROTOCOLO DÍA"
+    },
+    {
+      "id": "protocolo-noche",
+      "name": "Protocolo Noche",
+      "tagline": "Modo Reparación PM",
+      "type": "bundle",
+      "price": "234.000",
+      "originalPrice": "260.000",
+      "currency": "COP",
+      "description": "Acelera la renovación celular, repara el daño acumulado y estimula el colágeno mientras duermes.",
+      "productsIncluded": [
+        "infinity-retinal",
+        "chronos-c-shield"
+      ],
+      "ctaText": "AÑADIR PROTOCOLO NOCHE"
+    },
+    {
+      "id": "protocolo-longevidad",
+      "name": "Protocolo Longevidad",
+      "tagline": "Reparación y Renovación Celular",
+      "type": "bundle",
+      "price": "270.000",
+      "originalPrice": "370.000",
+      "currency": "COP",
+      "description": "La combinación definitiva para la reparación celular profunda y la estimulación de colágeno.",
+      "productsIncluded": [
+        "infinity-retinal",
+        "chronos-c-shield",
+        "guia-skin-streaming"
+      ],
+      "ctaText": "AÑADIR PROTOCOLO LONGEVIDAD",
+      "image": "/images/bundle-protocol.jpg"
+    },
+    {
+      "id": "protocolo-universal",
+      "name": "Protocolo Universal 24h",
+      "tagline": "La Rutina Definitiva",
+      "type": "bundle",
+      "price": "384.000",
+      "originalPrice": "480.000",
+      "currency": "COP",
+      "description": "La sinergia completa. Protección de día y reparación de noche para detener el envejecimiento prematuro y transformar tu piel en 30 días.",
+      "productsIncluded": [
+        "chronos-c-shield",
+        "hydro-lock-serum",
+        "invisible-shield-spf",
+        "infinity-retinal"
+      ],
+      "ctaText": "AÑADIR RUTINA UNIVERSAL"
+    }
+  ],
+  "others": [
+    {
+      "id": "shipping",
+      "name": "Envío",
+      "details": "Envío gratis a toda Colombia en pedidos superiores a $80.000",
+      "threshold": "80.000",
+      "currency": "COP"
+    },
+    {
+      "id": "guia-skin-streaming",
+      "name": "Guía Skin Streaming",
+      "type": "digital",
+      "price": "50.000",
+      "currency": "COP",
+      "description": "Guía digital para optimizar tu rutina de skincare."
+    }
+  ]
+}

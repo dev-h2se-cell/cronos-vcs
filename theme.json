@@ -1,0 +1,16 @@
+{
+  "brandName": "Your Brand",
+  "theme": {
+    "colors": {
+      "primary": "#007bff",
+      "secondary": "#6c757d",
+      "accent": "#ffc107",
+      "text": "#212529",
+      "background": "#ffffff"
+    },
+    "fonts": {
+      "body": "sans-serif",
+      "heading": "sans-serif"
+    }
+  }
+}
