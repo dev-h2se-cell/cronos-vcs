@@ -1,13 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { X, Send, Image as ImageIcon, Bot, Loader2, MessageCircle } from 'lucide-react';
-import { ProductData, ProductItem, ProtocolItem } from '../types';
+import { X, Send, Image as ImageIcon, Bot, Loader2, MessageCircle, ShoppingCart } from 'lucide-react';
+
+// --- Interfaces ---
+interface MessagePart {
+  text: string;
+  image?: string; 
+}
 
 interface Message {
   id: string;
   role: 'user' | 'model';
-  text: string;
-  image?: string;
-  isThinking?: boolean;
+  parts: MessagePart[];
 }
 
 interface ChatbotProps {
@@ -16,219 +19,192 @@ interface ChatbotProps {
   initialMessage?: string;
   onAddToCart: (productId: string, quantity?: number) => void;
   getCartSummary: () => string;
-  productsData: ProductData;
 }
 
-// WhatsAppLink as a standalone component for reusability
-const WhatsAppLink: React.FC<{ message?: string }> = ({ message }) => {
+// --- Helper Functions ---
+const getWhatsAppUrl = (message?: string) => {
   const phoneNumber = '573181436525';
   const defaultMessage = 'Hola, vengo del chat de Chronos y necesito ayuda de un experto.';
-  const whatsappMessage = message || defaultMessage;
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-  return (
-    <a
-      href={whatsappUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="mt-3 flex items-center justify-center gap-2 w-full bg-[#25D366] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#20bd5a] transition-all"
-    >
-      <MessageCircle size={16} />
-      Hablar por WhatsApp
-    </a>
-  );
+  const finalMessage = message || defaultMessage;
+  return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(finalMessage)}`;
 };
 
-
-export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, initialMessage, onAddToCart, getCartSummary, productsData }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'welcome',
-      role: 'model',
-      text: 'Hola. Soy Chronos AI, tu especialista clínico. ¿En qué puedo ayudarte hoy?'
+const parseAction = (text: string): { action: string, params: string[] } | null => {
+    const match = text.match(/\[ACTION:([A-Z_]+):?([^\]]*)\]/);
+    if (match) {
+        return {
+            action: match[1],
+            params: match[2] ? match[2].split(':') : [],
+        };
     }
-  ]);
+    return null;
+};
+
+// --- Main Component ---
+export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, initialMessage, onAddToCart, getCartSummary }) => {
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the file input
+  const [processedInitialMessage, setProcessedInitialMessage] = useState(false);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  
+  // Initialize with a welcome message
+  useEffect(() => {
+    if (messages.length === 0) {
+      setMessages([{
+        id: 'welcome-' + Date.now(),
+        role: 'model',
+        parts: [{ text: "Hola. Soy Calíope, tu curadora de belleza personal. ¿Qué resultado buscas para tu piel hoy?" }]
+      }]);
+    }
+  }, []);
 
+  // Scroll to bottom when new messages arrive
   useEffect(() => {
     if (isOpen) {
-        scrollToBottom();
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
 
-  // Effect to handle initial message from CTA
+  // Handle initial message from CTAs
   useEffect(() => {
-    if (isOpen && initialMessage) {
+    if (isOpen && initialMessage && !processedInitialMessage) {
       handleSend(initialMessage);
+      setProcessedInitialMessage(true); // Mark as processed
     }
-  }, [isOpen, initialMessage]);
+    if (!isOpen) {
+      setProcessedInitialMessage(false); // Reset when closed
+    }
+  }, [isOpen, initialMessage, processedInitialMessage]);
 
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result as string);
-      };
+      reader.onloadend = () => setSelectedImage(reader.result as string);
       reader.readAsDataURL(file);
     }
+    // Reset file input to allow re-uploading the same file
+    if(e.target) e.target.value = '';
   };
-
-  const handleLocalIntent = (lowerCaseMessage: string): boolean => {
-    // --- Local Intent Detection ---
-    const finalizeKeywords = ['finalizar pedido', 'resumen', 'cerrar compra', 'quiero pagar', 'asesor', 'whatsapp'];
-    if (finalizeKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
-      const summary = getCartSummary();
-      setMessages(prev => [...prev, { id: 'summary-' + Date.now(), role: 'model', text: summary }]);
-      setIsLoading(false);
-      return true;
-    }
-
-    let foundProduct: ProductItem | ProtocolItem | undefined;
-    let quantity = 1;
-    for (const product of [...productsData.products, ...productsData.protocols]) {
-      const productSearchTerms = [
-        product.name.toLowerCase().replace(/[™+]/g, '').trim(),
-        product.id.replace(/-/g, ' ').toLowerCase(),
-        product.id.toLowerCase()
-      ].filter(Boolean);
-      const regexPatterns = productSearchTerms.map(term => term.split(/[\\s-]+/).filter(Boolean).join('[\\s-]*'));
-      const combinedPattern = new RegExp(`(${regexPatterns.join('|')})`, 'i');
-      if (combinedPattern.test(lowerCaseMessage)) {
-        foundProduct = product;
-        const quantityMatch = lowerCaseMessage.match(/(\d+)\s*(unidad|unidades)/i);
-        if (quantityMatch && parseInt(quantityMatch[1]) > 0) quantity = parseInt(quantityMatch[1]);
-        break;
-      }
-    }
-
-    if (foundProduct) {
-      onAddToCart(foundProduct.id, quantity);
-      setMessages(prev => [...prev, {
-        id: 'addtocart-' + Date.now(),
-        role: 'model',
-        text: `¡Perfecto! He añadido ${quantity} unidad(es) de "${foundProduct.name}" al carrito. ¿Deseas algo más o prefieres finalizar tu pedido?`,
-      }]);
-      setIsLoading(false);
-      return true;
-    }
-
-    const humanKeywords = ['humano', 'persona', 'agente', 'asesor'];
-    if (humanKeywords.some(keyword => lowerCaseMessage.includes(keyword))) {
-      setMessages(prev => [...prev, {
-        id: 'human-escalation-' + Date.now(),
-        role: 'model',
-        text: 'Entiendo. Para una consulta más personalizada, puedes hablar con un agente humano por WhatsApp.',
-      }]);
-      setIsLoading(false);
-      return true;
-    }
-    return false;
-  };
-
+  
   const handleSend = async (ctaMessage?: string) => {
-    const currentInputText = ctaMessage || inputText.trim();
-    if (!currentInputText || isLoading) return;
+    const currentInput = ctaMessage || inputText.trim();
+    if (!currentInput && !selectedImage) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      text: currentInputText,
-      image: selectedImage || undefined, // Store image in local state for display
-    };
-
-    const newMessages: Message[] = [...messages, userMessage];
-    setMessages(prev => [...prev, userMessage]);
-
-    if (!ctaMessage) {
-      setInputText('');
-      setSelectedImage(null);
-    }
-    
     setIsLoading(true);
 
-    const lowerCaseMessage = currentInputText.toLowerCase();
+    const userParts: MessagePart[] = [];
+    if (currentInput) userParts.push({ text: currentInput });
+    if (selectedImage && !currentInput) userParts.push({ text: "Analiza esta imagen de mi piel." });
 
-    if (handleLocalIntent(lowerCaseMessage)) {
-      return;
-    }
+    const userMessage: Message = {
+      id: 'user-' + Date.now(),
+      role: 'user',
+      parts: userParts.map(part => selectedImage ? { ...part, image: selectedImage } : part),
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setInputText('');
+    setSelectedImage(null);
+    
+    const newModelMessageId = 'model-' + Date.now();
 
-    // --- Secure API Call to Backend ---
     try {
-      const historyForApi = newMessages
-        .filter(msg => !msg.isThinking) // Don't send "thinking" messages
-        .map(msg => {
-          const parts: { text?: string; image?: string }[] = [];
-          if (msg.text) {
-            parts.push({ text: msg.text });
-          }
-          if (msg.image) {
-            parts.push({ image: msg.image });
-          }
-          return {
-            role: msg.role,
-            parts: parts,
-          };
-        });
+      const historyForApi = [...messages, userMessage].map(msg => ({
+        role: msg.role,
+        parts: msg.parts.map(part => ({
+          text: part.text,
+          ...(part.image && { image: part.image }),
+        })),
+      }));
 
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          history: historyForApi,
-          knowledgeBase: `KNOWLEDGE BASE (Products & Protocols JSON):\n${JSON.stringify(productsData, null, 2)}`,
-        }),
+        body: JSON.stringify({ history: historyForApi }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.details || `Error del servidor: ${response.status}`);
+        // If response is not ok, read the body as text and throw it as an error.
+        // This will be caught by the catch block below.
+        const errorBody = await response.text();
+        throw new Error(errorBody || `Error: ${response.status}`);
       }
 
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('No se pudo leer la respuesta del servidor.');
+      if (!response.body) {
+        throw new Error('Response body is empty.');
       }
 
-      const decoder = new TextDecoder();
-      let fullResponseText = '';
-      const responseMsgId = (Date.now() + 1).toString();
+      setMessages(prev => [...prev, { id: newModelMessageId, role: 'model', parts: [{ text: '' }] }]);
       
-      setMessages(prev => [...prev, { id: responseMsgId, role: 'model', text: '' }]);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedText = '';
 
       while (true) {
-        const { done, value } = await reader.read();
+        const { value, done } = await reader.read();
         if (done) break;
-        fullResponseText += decoder.decode(value, { stream: true });
-        setMessages(prev => prev.map(msg =>
-          msg.id === responseMsgId ? { ...msg, text: fullResponseText } : msg
+        
+        const chunk = decoder.decode(value, { stream: true });
+        accumulatedText += chunk;
+
+        setMessages(prev => prev.map(msg => 
+            msg.id === newModelMessageId 
+            ? { ...msg, parts: [{ text: accumulatedText }] }
+            : msg
         ));
+      }
+      
+      // --- Action Processing ---
+      const action = parseAction(accumulatedText);
+      if (action) {
+        let actionResponseMessage = '';
+        if (action.action === 'ADD_TO_CART') {
+            const [productId, quantityStr] = action.params;
+            const quantity = quantityStr ? parseInt(quantityStr, 10) : 1;
+            if (productId) {
+                onAddToCart(productId, quantity);
+                actionResponseMessage = `¡Perfecto! He añadido el producto a tu carrito. ¿Deseas algo más o prefieres finalizar el pedido?`;
+            }
+        } else if (action.action === 'GET_CART_SUMMARY') {
+            actionResponseMessage = getCartSummary();
+        } else if (action.action === 'TALK_TO_ADVISOR') {
+             actionResponseMessage = `Claro, para hablar con un asesor humano puedes hacer clic en el botón de abajo o en este enlace: ${getWhatsAppUrl()}`;
+        }
+        
+        // Update the message with the user-friendly response or remove it if no response
+        setMessages(prev => prev.map(msg => 
+            msg.id === newModelMessageId && actionResponseMessage
+            ? { ...msg, parts: [{ text: actionResponseMessage }] }
+            : msg
+        ).filter(msg => !(msg.id === newModelMessageId && !actionResponseMessage)));
       }
 
     } catch (error) {
-      console.error("Chat error:", error);
-      let errorMessage = 'Lo siento, hubo un error técnico.';
+      console.error("Chat streaming error:", error);
+      let errorText = 'Lo siento, hubo un problema de comunicación. Por favor, inténtalo de nuevo.';
+      
       if (error instanceof Error) {
-        errorMessage = error.message;
-        // Attempt to parse API error details if available
+        // The error message now contains the raw text from the server response
+        const serverError = error.message;
         try {
-          const errorJson = JSON.parse(error.message);
-          if (errorJson.details) {
-            errorMessage = errorJson.details;
-          }
-        } catch (e) {
-          // Not a JSON error message, use the default error.message
+            // Check if the raw text is actually JSON with a details property
+            const jsonError = JSON.parse(serverError);
+            errorText = jsonError.details || jsonError.error || serverError;
+        } catch(e) {
+            // If it's not JSON, it's the raw error message (like a Vercel crash page)
+            // We show a snippet of it.
+            errorText = serverError.substring(0, 500);
         }
       }
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: 'model', text: errorMessage }]);
+
+      // Add a new error message instead of replacing the placeholder
+      setMessages(prev => [...prev.filter(m => m.id !== newModelMessageId), { id: 'error-' + Date.now(), role: 'model', parts: [{ text: errorText }] }]);
     } finally {
       setIsLoading(false);
     }
@@ -236,34 +212,22 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, initialMessag
 
   if (!isOpen) return null;
 
-  // Determine if the last message requires a WhatsApp button
-  const lastMessage = messages[messages.length - 1];
-  const showWhatsAppForLastMessage = lastMessage.role === 'model' &&
-    (lastMessage.text.includes("Tu pedido actual") || lastMessage.text.includes("hablar con un agente humano"));
-
-
   return (
     <div 
-      className="fixed bottom-0 right-0 top-0 left-0 bg-black/30 z-40 flex justify-end items-end animate-fade-in-fast" 
+      className="fixed inset-0 bg-black/30 z-40 flex justify-end items-end animate-fade-in-fast" 
       onClick={onClose}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          onClose();
-        }
-      }}
-      role="button"
-      tabIndex={0}
       aria-label="Cerrar chat"
     >
       <div 
         className="fixed bottom-6 right-6 w-[90vw] md:w-[400px] h-[75vh] max-h-[700px] bg-white rounded-2xl shadow-2xl z-50 flex flex-col border border-slate-200 overflow-hidden font-sans" 
         onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
         aria-labelledby="chatbot-heading"
       >
           
           {/* Header */}
-          <div className="bg-slate-900 p-4 flex items-center justify-between border-b border-slate-800">
+          <div className="bg-slate-900 p-4 flex items-center justify-between border-b border-slate-800 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-tr from-orange-500 to-purple-600 rounded-full flex items-center justify-center">
                 <Bot size={20} className="text-white" />
@@ -271,12 +235,12 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, initialMessag
               <div>
                 <h3 id="chatbot-heading" className="text-white font-bold">Chronos Skin AI</h3>
                 <div className="flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full bg-green-500`}></span>
-                  <span className="text-xs text-slate-400">Online</span>
+                  <span className={`w-2 h-2 rounded-full ${isLoading ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'}`}></span>
+                  <span className="text-xs text-slate-400">{isLoading ? 'Escribiendo...' : 'Online'}</span>
                 </div>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 text-slate-400 hover:text-white"><X size={20}/></button>
+            <button onClick={onClose} className="p-2 text-slate-400 hover:text-white" aria-label="Cerrar"><X size={20}/></button>
           </div>
 
           {/* Messages Area */}
@@ -290,55 +254,58 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, initialMessag
                       : 'bg-white text-slate-800 border border-slate-200 rounded-tl-none'
                   }`}
                 >
-                  {msg.image && (
-                    <div className="mb-2 rounded-lg overflow-hidden border border-white/20">
-                      <img src={msg.image} alt="Upload" className="w-full h-auto object-cover max-h-40" />
-                    </div>
-                  )}
-                  
-                  <div className="whitespace-pre-wrap">{msg.text}</div>
+                  {msg.parts.map((part, index) => (
+                    <React.Fragment key={index}>
+                      {part.image && (
+                        <div className="mb-2 rounded-lg overflow-hidden border border-white/20">
+                          <img src={part.image} alt="Imagen subida por el usuario" className="w-full h-auto object-cover max-h-40" />
+                        </div>
+                      )}
+                      <div className="whitespace-pre-wrap">{part.text}</div>
+                    </React.Fragment>
+                  ))}
                 </div>
               </div>
             ))}
-            {showWhatsAppForLastMessage && <WhatsAppLink message={lastMessage.text} />}
+             {isLoading && messages[messages.length - 1]?.role !== 'model' && (
+              <div className="flex justify-start">
+                  <div className="max-w-[85%] rounded-2xl p-3 text-sm bg-white text-slate-800 border border-slate-200 rounded-tl-none inline-flex items-center gap-2">
+                      <Loader2 size={16} className="animate-spin text-slate-500" />
+                  </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-white border-t border-slate-100">
+          <div className="p-4 bg-white border-t border-slate-100 flex-shrink-0">
             {selectedImage && (
               <div className="mb-2 flex items-center gap-2 bg-slate-100 p-2 rounded-lg text-xs text-slate-600">
                 <ImageIcon size={14} />
                 <span>Imagen adjunta</span>
-                <button onClick={() => setSelectedImage(null)} className="ml-auto hover:text-red-500"><X size={14}/></button>
+                <button onClick={() => setSelectedImage(null)} className="ml-auto hover:text-red-500" aria-label="Quitar imagen"><X size={14}/></button>
               </div>
             )}
             
             <div className="flex items-center gap-2">
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                ref={fileInputRef}
-                onChange={handleImageUpload}
-              />
+              <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageUpload} className="hidden" />
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
-                title="Analizar Foto"
+                className="p-3 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 transition-colors"
+                aria-label="Adjuntar imagen"
               >
-                <ImageIcon size={20} />
+                <ImageIcon size={18} />
               </button>
-              
               <div className="flex-1 relative">
                 <input
                   type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder={"Escribe tu duda..."}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (handleSend(), e.preventDefault())}
+                  placeholder="Escribe tu duda..."
                   disabled={isLoading}
                   className="w-full bg-slate-100 text-slate-900 text-sm rounded-full py-3 px-4 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all disabled:opacity-50"
+                  aria-label="Mensaje del chat"
                 />
               </div>
 
@@ -346,11 +313,33 @@ export const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose, initialMessag
                 onClick={() => handleSend()}
                 disabled={isLoading || (!inputText.trim() && !selectedImage)}
                 className="p-3 bg-slate-900 text-white rounded-full hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-transform active:scale-95 shadow-lg"
+                aria-label="Enviar mensaje"
               >
                 {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
               </button>
             </div>
-            <div className="text-[10px] text-center text-slate-400 mt-2">
+            
+            <div className="mt-3 grid grid-cols-2 gap-2">
+                <button 
+                  onClick={() => handleSend("Quiero finalizar mi pedido y ver el resumen.")}
+                  className="flex items-center justify-center gap-2 text-sm bg-slate-100 text-slate-700 font-medium py-2 px-3 rounded-lg hover:bg-slate-200 transition-colors"
+                  title="Finalizar Pedido"
+                >
+                  <ShoppingCart size={16} />
+                  Finalizar Pedido
+                </button>
+                <a
+                  href={getWhatsAppUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 text-sm bg-slate-100 text-slate-700 font-medium py-2 px-3 rounded-lg hover:bg-slate-200 transition-colors"
+                >
+                  <MessageCircle size={16} />
+                  Hablar con Asesor
+                </a>
+            </div>
+
+            <div className="text-[10px] text-center text-slate-400 mt-3">
               Usando Gemini 1.5 Flash
             </div>
           </div>

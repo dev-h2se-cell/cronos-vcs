@@ -78,8 +78,8 @@ export const Hero: React.FC<HeroProps> = ({ productsData }) => {
                   alt="CHRONOS-C Shield Bottle"
                   width={800}
                   height={1000}
+
                   // eslint-disable-next-line react/no-unknown-property
-                  // @ts-ignore 
                   fetchpriority="high"
                   decoding="async"
                   className="w-full h-full object-cover mix-blend-multiply opacity-90 transition-transform duration-700 group-hover:scale-105" 

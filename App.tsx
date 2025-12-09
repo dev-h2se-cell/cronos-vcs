@@ -59,7 +59,7 @@ function App() {
           price: priceNumber,
           quantity: quantity,
           currency: product.currency,
-          image: (product as any).image || undefined
+          image: product.image || undefined
         };
         newCart.push(newCartItem);
       }
@@ -196,7 +196,6 @@ function App() {
         initialMessage={initialBotMessage}
         onAddToCart={handleAddToCart}
         getCartSummary={getCartSummary}
-        productsData={typedProductsData}
       />
     </div>
   );

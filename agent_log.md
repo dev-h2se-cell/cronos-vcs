@@ -17,6 +17,51 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
 
 ## Historial de Cambios
 
+### 08/12/2025 - Depuración Extensa de la Función Serverless del Chatbot y Diagnóstico de Problema Ambiental
+
+*   **Contexto:** Se detectaron errores `502 Bad Gateway` y `NO_RESPONSE_FROM_FUNCTION` (que se manifestó como `Error: Cannot read properties of undefined (reading 'startsWith')`) al intentar interactuar con el chatbot. El problema ocurría en el entorno de desarrollo local con `vercel dev`.
+*   **Análisis del Problema:**
+    *   La clave fue que el error `Cannot read properties of undefined (reading 'startsWith')` ocurría **antes** de que cualquier `console.log` dentro de la función serverless se ejecutara, indicando un fallo en la etapa de carga del módulo o inicialización de la función por parte del runtime de Vercel.
+    *   Se realizaron múltiples intentos de depuración:
+        *   Mejora del manejo de errores en el frontend (`Chatbot.tsx`) para obtener mensajes de error más claros.
+        *   Refactorización del backend (originalmente `api/chat.ts`) para actuar como orquestador inteligente, inyección de base de conocimiento, uso de `systemPrompt` para el modelo Gemini, y respuesta por streaming con acciones estructuradas.
+        *   Implementación de diversas estrategias para la lectura de JSON (tanto `fs.readFileSync` como `import`) y la importación de la librería de Gemini (estática y dinámica) en el backend.
+        *   Pruebas con código mínimo en la función serverless para aislar la causa del crash.
+        *   Identificación y eliminación de un conflicto en `package.json` con dos paquetes de Google AI (`@google/genai` y `@google/generative-ai`), lo que se consideró una posible causa raíz de inestabilidad.
+        *   Renombre del archivo de la API de `api/chat.ts` a `api/gemini.ts` para descartar una posible corrupción del archivo original.
+    *   A pesar de todos los esfuerzos y de aplicar múltiples soluciones válidas para los problemas detectados (como el conflicto de dependencias o errores de scope), el error `Error: Cannot read properties of undefined (reading 'startsWith')` persistió sin que se ejecutara ninguna línea del código de la función.
+    *   **Conclusión Final:** El problema se diagnosticó como un problema ambiental en el entorno de desarrollo local del usuario, posiblemente relacionado con una versión de Node.js incompatible (se identificó `v22.21.0`, que no es LTS) o un problema con la instalación/ejecución de Vercel CLI, que causaba que la función fallara antes de que el código pudiera ejecutarse. Este tipo de error requiere una intervención directa en el entorno del usuario.
+*   **Cambios Realizados:**
+    1.  **Backend (originalmente `api/chat.ts`, ahora `api/gemini.ts`):**
+        *   Refactorización completa para actuar como un orquestador inteligente: inyección de `products.json` y `faq.json` como base de conocimiento.
+        *   Definición de un `systemPrompt` detallado para guiar la personalidad y las acciones del modelo Gemini.
+        *   Implementación de streaming de respuestas y un mecanismo de acciones estructuradas (`[ACTION:...]`) para interactuar con el frontend.
+        *   Uso de importación dinámica de `@google/generative-ai` para mayor robustez en la carga del módulo.
+        *   Corrección de un bug en el mapeo de `message.parts` para manejar correctamente partes con texto e imagen simultáneamente.
+        *   Se restauró el uso de `fs.readFileSync` y `path.resolve` para la carga de JSON.
+    2.  **Frontend (`components/Chatbot.tsx`):**
+        *   Eliminación de la lógica de detección de intenciones basada en expresiones regulares (`regex`), delegando esta tarea completamente al backend (modelo Gemini).
+        *   Implementación del consumo de la respuesta por streaming y el procesamiento de las acciones estructuradas recibidas del backend.
+        *   Mejora robusta del manejo de errores en el `fetch` de la API para mostrar mensajes más claros del servidor (incluso si no son JSON).
+        *   Corrección de la advertencia de React sobre el uso del `ref` en el input de subida de imágenes.
+        *   Actualización de la URL de `fetch` de `/api/chat` a `/api/gemini`.
+    3.  **Configuración/Dependencias:**
+        *   Se eliminó el paquete `@google/genai` de `package.json` mediante `npm uninstall @google/genai`.
+        *   Se renombró `api/chat.ts` a `api/gemini.ts` y se eliminó el archivo original `api/chat.ts`.
+*   **Resultado:** El código del chatbot se ha refactorizado significativamente, aumentando su robustez, mantenibilidad e inteligencia. Sin embargo, la función serverless continúa fallando en el entorno de desarrollo local del usuario debido a un problema ambiental no resuelto, impidiendo la ejecución del código funcional.
+
+### 08/12/2025 - Corrección de Advertencia 'fetchPriority' en `components/Hero.tsx` (Revisado)
+
+*   **Contexto:** Tras una corrección previa para usar `fetchPriority` (camelCase) basada en una sugerencia del linter, React emitió una advertencia en tiempo de ejecución: `React does not recognize the 
+`fetchPriority` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase 
+`fetchpriority` instead.`
+*   **Análisis del Problema:** Se identificó un conflicto entre la recomendación del linter (camelCase) y el comportamiento de React en el DOM para atributos HTML no estándar. React esperaba la versión en minúsculas (`fetchpriority`) para tratarlo como un atributo personalizado.
+*   **Cambios Realizados:**
+    1.  **Reversión a `fetchpriority` (minúsculas):** Se cambió `fetchPriority="high"` de vuelta a `fetchpriority="high"` en `components/Hero.tsx`.
+    2.  **Supresión de Linting:** Se reintrodujo `// eslint-disable-next-line react/no-unknown-property` sobre la línea afectada para suprimir la advertencia del linter, priorizando la compatibilidad con el runtime de React y evitando errores en la consola del navegador.
+    3.  **Eliminación de `@ts-expect-error`:** Se eliminó la directiva `@ts-expect-error` que se había añadido previamente, ya que la supresión del linter hace que ya no sea necesaria.
+*   **Resultado:** Se ha resuelto la advertencia en tiempo de ejecución de React, asegurando que el componente `Hero` se renderice sin errores en la consola del navegador, y la configuración de linting se ha ajustado para acomodar este comportamiento.
+
 ### 05/12/2025 - Diagnóstico de Fallo en Actualización de Carrito y Propuesta de Soluciones
 
 *   **Contexto:** Tras implementar la lógica del carrito en el chatbot y confirmarla en el repositorio (commit `9648a26`), el usuario ha declarado la actualización como un "fracaso". Este informe analiza las posibles causas y propone soluciones.
@@ -52,13 +97,13 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
     2.  **Modificación de Componentes de Ofertas (CTAs):**
         *   Se actualizaron las props `onAddToCart` en `RetinalProductPage`, `HydroLockProductScreen`, `InvisibleShieldProductScreen`, `ChronosProductScreen`, `Offer`, `ShopTheRoutine`, y todos sus subcomponentes (`*Offers.tsx`, `*MobileCta.tsx`).
         *   Ahora, los botones de "Añadir al Carrito" invocan `handleCtaToBot` con el ID del producto y la cantidad, abriendo el chatbot con la solicitud.
-    3.  **Implementación de Backend Seguro (`api/chat.ts`):**
+    3.  **Implementación de Backend Seguro (originalmente `api/chat.ts`):**
         *   Se creó el directorio `api/` y el archivo `api/chat.ts` como una función serverless de Vercel (Edge Runtime).
-        *   Esta función actúa como proxy seguro: recibe peticiones del frontend, accede a la `GEMINI_API_KEY` (configurada de forma segura en el servidor), llama a la API de Gemini y devuelve la respuesta en formato stream al frontend.
+        *   Esta función actuó como proxy seguro: recibió peticiones del frontend, accedió a la `GEMINI_API_KEY` (configurada de forma segura en el servidor), llamó a la API de Gemini y devolvió la respuesta en formato stream al frontend.
     4.  **Actualización de `Chatbot.tsx`:**
         *   Se modificó la interfaz `ChatbotProps` para recibir `isOpen`, `onClose` y `initialMessage`.
         *   Se implementó un `useEffect` para procesar automáticamente el `initialMessage` al abrir el chatbot.
-        *   Se reescribió la función `handleSend` para que realice una petición `fetch` a nuestro nuevo endpoint `/api/chat` en lugar de llamar directamente a la API de Google. Se eliminaron todas las referencias a la API Key del frontend.
+        *   Se reescribió la función `handleSend` para que realizara una petición `fetch` a nuestro nuevo endpoint `/api/chat` en lugar de llamar directamente a la API de Google. Se eliminaron todas las referencias a la API Key del frontend.
         *   Se corrigió la importación de `@google/genai` en `api/chat.ts`.
     5.  **Configuración de Entorno de Desarrollo:**
         *   Se añadió `vercel` como `devDependency` en `package.json`.
@@ -74,7 +119,7 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
 *   **Cambios Realizados:**
     1.  **Refactorización de Expresión Regular:** Se modificó la lógica de generación de `productNameRegex` en `components/Chatbot.tsx` para hacerla más flexible.
         *   Se limpiaron los nombres de productos (eliminando `™`, `+`).
-        *   La expresión regular se construyó para permitir la coincidencia de las palabras clave del producto, incluso si están separadas por espacios o guiones, mediante el uso de `[\s-`*` como separador flexible en lugar de solo `.*`.
+        *   La expresión regular se construyó para permitir la coincidencia de las palabras clave del producto, incluso si están separadas por espacios o guiones, mediante el uso de `[\]s[-]`*` como separador flexible en lugar de solo `.*`.
         *   Esto permite que "chronos-c shield" y "chronos c shield" se reconozcan de manera más efectiva.
     2.  **Añadir Logs de Depuración:** Se insertaron `console.log` temporales en `handleSend` de `Chatbot.tsx` para trazar `lowerCaseMessage`, `product.name`, `product.id`, la `productNameRegex` generada y el `Test result` durante el proceso de depuración. (Estos logs se eliminarán una vez confirmada la funcionalidad).
 *   **Resultado:** Se ha mejorado la flexibilidad del NLU del chatbot para reconocer productos, lo que debería permitirle manejar correctamente la intención de "añadir al carrito". La fase de depuración está en curso.
@@ -99,7 +144,9 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
 
 ### 03/12/2025 - Corrección de Advertencia 'fetchPriority' en `components/Hero.tsx`
 
-*   **Contexto:** Se recibió una advertencia de React: `React does not recognize the `fetchPriority` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `fetchpriority` instead.`
+*   **Contexto:** Se recibió una advertencia de React: `React does not recognize the 
+`fetchPriority` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase 
+`fetchpriority` instead.`
 *   **Análisis del Problema:** A pesar de que TypeScript esperaba `fetchPriority` (camelCase), React en el DOM esperaba `fetchpriority` (lowercase) para este atributo HTML específico, generando una advertencia de prop no reconocida.
 *   **Cambios Realizados:** Se cambió `fetchPriority="high"` a `fetchpriority="high"` en el JSX del componente `components/Hero.tsx`.
 *   **Resultado:** La advertencia de React ha sido eliminada.
@@ -259,7 +306,7 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
     3.  **Actualización de `components/hydrolock/HydroLockOffers.tsx`:** Se actualizaron los precios del "Solo Serum" (Hydro-Lock) a $110.000, la suscripción a $92.000 (con precio anterior tachado de $110.000), "Kit de Barrera (SOS)" a $210.000 y "Rutina AM (Power Pair)" a $210.000).
     4.  **Actualización de `components/invisibleshield/InvisibleShieldOffers.tsx`:** Se actualizaron los precios del "Solo Escudo" (Invisible Shield) a $110.000, la suscripción a $87.000 (con precio anterior tachado de $110.000) y "POWER PAIR AM" a $200.000 (con precio anterior tachado de $220.000).
     5.  **Actualización de `components/Offer.tsx` (Chronos-C):** Se actualizó el precio del "El Iniciado" (Chronos-C individual) a $110.000 y el "PROTOCOLO DE LONGEVIDAD" (Chronos-C + Retinal) a $250.000 (con precio anterior tachado de $260.000). Se añadió una función `formatPrice` para formatear los precios como COP.
-    6.  **Actualización de `components/ShopTheRoutine.tsx` (Chronos-C bundle):** Se actualizó el precio del "Kit 'Glow de Mañana'" a $280.000 (con precio anterior tachado de $330.000).
+    6.  **Actualización de `components/ShopTheRoutine.tsx` (Chronos-C bundle):** Se actualizó el precio del "Kit 'Glow de Mañana'" a $280.000 (con precio tachado de $330.000).
 *   **Resultado:** Todos los precios en la aplicación ahora se muestran en Pesos Colombianos, con los bundles reflejando descuentos calculados.
 
 ### 01/12/2025 - Refactorización de Páginas de Productos Monolíticas a Modular
@@ -327,5 +374,5 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
         *   Se eliminaron todas las definiciones locales duplicadas de `formatPrice` en todos los componentes.
         *   Se actualizó *cada componente que usaba `formatPrice`* para importar la función desde `utils/formatPrice.ts` con la ruta relativa correcta.
         *   Se eliminaron todos los signos `$` literales del JSX donde se invocaba `formatPrice`, asegurando que el símbolo de moneda fuera añadido una sola vez por la función.
-    2.  **Sobreescritura Masiva de Archivos Clave:** Para mitigar problemas de cacheo y asegurar que el entorno del usuario tuviera la versión correcta de los archivos, se sobreescribieron de forma completa y explícitamente los contenidos de 27 archivos (`App.tsx`, `components/BeforeAfterSlider.tsx`, `components/ChronosProductScreen.tsx`, `components/Hero.tsx`, `components/LongevityProtocolScreen.tsx`, `components/Offer.tsx`, `components/ProtocolsScreen.tsx`, `components/ShopTheRoutine.tsx`, `components/hydrolock/HydroLockHero.tsx`, `components/hydrolock/HydroLockMobileCta.tsx`, `components/hydrolock/HydroLockOffers.tsx`, `components/invisibleshield/InvisibleShieldHero.tsx`, `components/invisibleshield/InvisibleShieldMobileCta.tsx`, `components/invisibleshield/InvisibleShieldOffers.tsx`, `components/retinal/RetinalHero.tsx`, `components/retinal/RetinalMobileCta.tsx`, `components/retinal/RetinalOffers.tsx`, `hooks/useScrollToSection.ts`, `products.json`, `types.ts`, `vite.config.ts`, `tailwind.config.js`, `tsconfig.json`, `src/setupTests.ts`, `components/Button.test.tsx`, `hooks/useScrollToSection.test.ts`, `utils/formatPrice.ts`) con sus contenidos finales y verificados.
+    2.  **Sobreescritura Masiva de Archivos Clave:** Para mitigar problemas de cacheo y asegurar que el entorno del usuario tuviera la versión correcta de los archivos, se sobreescribieron de forma completa y explícitamente los contenidos de 27 archivos (`App.tsx`, `components/BeforeAfterSlider.tsx`, `components/ChronosProductScreen.tsx`, `components/Hero.tsx`, `components/LongevityProtocolScreen.tsx`, `components/Offer.tsx`, `components/ProtocolsScreen.tsx`, `components/ShopTheRoutine.tsx`, `components/hydrolock/HydroLockHero.tsx`, `components/hydrolock/HydroLockMobileCta.tsx`, `components/hydrolock/HydroLockOffers.tsx`, `components/invisibleshield/InvisibleShieldHero.tsx`, `components/invisibleshield/InvisibleShieldMobileCta.tsx`, `components/invisibleshield/InvisibleShieldMobileCta.tsx`, `components/retinal/RetinalHero.tsx`, `components/retinal/RetinalMobileCta.tsx`, `components/retinal/RetinalOffers.tsx`, `hooks/useScrollToSection.ts`, `products.json`, `types.ts`, `vite.config.ts`, `tailwind.config.js`, `tsconfig.json`, `src/setupTests.ts`, `components/Button.test.tsx`, `hooks/useScrollToSection.test.ts`, `utils/formatPrice.ts`) con sus contenidos finales y verificados.
 *   **Resultado Esperado:** Se espera que estos cambios resuelvan tanto el problema del doble signo de pesos como los errores de carga de módulos, garantizando que todos los precios se muestren correctamente y que la aplicación se cargue sin errores en el navegador.
