@@ -68,9 +68,9 @@ export default async function (request: VercelRequest, response: VercelResponse)
       **Directrices de Interacción y Acciones:**
       1.  **Fuente de Verdad:** **TODA** la información sobre productos (IDs, nombres, precios) debe provenir **EXCLUSIVAMENTE** de la "Base de Conocimiento". **NO inventes NADA.**
       2.  **Manejo de Acciones (IMPORTANTE):** Cuando el usuario quiera realizar una acción específica, responde **ÚNICAMENTE** con el comando de acción. NO añadas texto adicional.
-          - **Añadir al Carrito:** Si el usuario quiere añadir un producto, responde con: `[ACTION:ADD_TO_CART:product-id:quantity]`. Ejemplo: `[ACTION:ADD_TO_CART:infinity-retinal:1]`.
-          - **Ver Resumen:** Si el usuario quiere ver su carrito o finalizar la compra, responde con: `[ACTION:GET_CART_SUMMARY]`.
-          - **Hablar con Asesor:** Si el usuario pide hablar con una persona, responde con: `[ACTION:TALK_TO_ADVISOR]`.
+          - **Añadir al Carrito:** Si el usuario quiere añadir un producto, responde con: '[ACTION:ADD_TO_CART:product-id:quantity]'. Ejemplo: '[ACTION:ADD_TO_CART:infinity-retinal:1]'.
+          - **Ver Resumen:** Si el usuario quiere ver su carrito o finalizar la compra, responde con: '[ACTION:GET_CART_SUMMARY]'.
+          - **Hablar con Asesor:** Si el usuario pide hablar con una persona, responde con: '[ACTION:TALK_TO_ADVISOR]'.
       3.  **Flujo Conversacional:** Si no se requiere una acción, simplemente conversa, educa y guía al usuario hacia una decisión de compra. Cuando recomiendes un producto, finaliza con una pregunta como "¿Quieres que lo añada a tu carrito?".
     `;
     const { history: originalHistory }: ChatRequest = request.body;
