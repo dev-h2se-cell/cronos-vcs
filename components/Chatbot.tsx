@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Image as ImageIcon, Sparkles, BrainCircuit, Bot, Loader2, MessageCircle } from 'lucide-react';
-import productsData from '../products.json';
-import type { Part } from "@google/genai"; // Static type import
 
 interface Message {
   id: string;
@@ -81,58 +79,31 @@ export const Chatbot: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Dynamic import to prevent app crash if SDK fails to load on init
-      const { GoogleGenAI } = await import("@google/genai");
+      // Prepare the history for the API call
+      const historyForApi = messages.map(msg => ({
+          role: msg.role === 'user' ? 'user' : 'model', // Ensure roles are 'user' or 'model'
+          parts: msg.image 
+              ? [{ text: msg.text }, { inlineData: { mimeType: 'image/jpeg', data: msg.image.split(',')[1] } }]
+              : [{ text: msg.text }],
+      }));
 
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      
-      if (!apiKey) {
-        throw new Error("API Key not found");
-      }
-
-      const ai = new GoogleGenAI({ apiKey });
-
-      // --- Model Selection Strategy ---
-      // 1. Image Analysis -> gemini-2.0-pro-exp-02-05 (Vision)
-      // 2. Expert/Thinking Mode -> gemini-2.0-flash-thinking-exp-01-21
-      // 3. Standard Chat -> gemini-2.0-flash-lite-preview-02-05 (Low Latency)
-      
-      const knowledgeBase = `KNOWLEDGE BASE (Products & Protocols JSON):\n${JSON.stringify(productsData, null, 2)}\n\n`;
-      let modelName = 'gemini-2.0-flash-lite-preview-02-05';
-      const config: { systemInstruction: string; thinkingConfig?: { thinkingBudget: number }; } = {
-        systemInstruction: knowledgeBase + "Eres un experto dermatólogo y consultor de la marca 'CHRONOS'. Tu tono es clínico, preciso y sofisticado ('Bio-Tech Luxury'). Responde dudas sobre Chronos-C Shield (Vitamina C), Infinity Retinal y el Protocolo de Longevidad basándote en el KNOWLEDGE BASE. Sé conciso.",
-      };
-
-      if (userMessage.image) {
-        modelName = 'gemini-2.0-pro-exp-02-05';
-        // Pro model used for visual analysis
-      } else if (isThinkingMode) {
-        modelName = 'gemini-2.0-flash-thinking-exp-01-21';
-        config.thinkingConfig = { thinkingBudget: 1024 }; 
-        // Set a reasonable thinking budget for the experimental model
-      }
-
-
-      // Prepare Content Parts
-      const parts: Part[] = [];
-      if (userMessage.image) {
-        const base64Data = userMessage.image.split(',')[1];
-        parts.push({
-          inlineData: {
-            mimeType: 'image/jpeg',
-            data: base64Data
-          }
-        });
-      }
-      if (userMessage.text) {
-        parts.push({ text: userMessage.text });
-      }
-
-      const responseStream = await ai.models.generateContentStream({
-        model: modelName,
-        contents: { parts },
-        config
+      const response = await fetch('/api/gemini', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ history: historyForApi }),
       });
+
+      if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.details || 'Error sending message to API.');
+      }
+
+      const reader = response.body?.getReader();
+      if (!reader) {
+          throw new Error('Could not get reader from response body.');
+      }
 
       let fullResponseText = '';
       const responseMsgId = (Date.now() + 1).toString();
@@ -144,14 +115,16 @@ export const Chatbot: React.FC = () => {
         isThinking: isThinkingMode
       }]);
 
-      for await (const chunk of responseStream) {
-        const text = chunk.text;
-        if (text) {
-          fullResponseText += text;
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = new TextDecoder().decode(value);
+          fullResponseText += chunk;
           setMessages(prev => prev.map(msg => 
-            msg.id === responseMsgId ? { ...msg, text: fullResponseText } : msg
+              msg.id === responseMsgId ? { ...msg, text: fullResponseText } : msg
           ));
-        }
       }
 
     } catch (error) {

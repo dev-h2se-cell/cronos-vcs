@@ -1,5 +1,7 @@
+/// <reference types="node" />
 /* global process */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { Part, InlineDataPart, Content } from '@google/generative-ai';
 import fs from 'fs';
 import path from 'path';
 
@@ -11,22 +13,9 @@ interface MessagePart {
   image?: string;
 }
 
-interface ApiMessagePart {
-  text?: string;
-  inlineData?: {
-    mimeType: string;
-    data: string;
-  };
-}
-
 interface Message {
   role: 'user' | 'model';
   parts: MessagePart[];
-}
-
-interface ApiMessage {
-    role: 'user' | 'model';
-    parts: ApiMessagePart[];
 }
 
 interface ChatRequest {
@@ -79,11 +68,11 @@ export default async function (request: VercelRequest, response: VercelResponse)
         return response.status(400).json({ error: 'Bad Request', details: 'History is invalid or not an array.' });
     }
     
-    const historyForApi: ApiMessage[] = originalHistory.map(message => {
+    const historyForApi: Content[] = originalHistory.map(message => {
       if (!message || !message.parts || !Array.isArray(message.parts)) {
         return { role: message.role || 'user', parts: [] };
       }
-      const parts: ApiMessagePart[] = [];
+      const parts: Part[] = [];
       message.parts.forEach(part => {
         if (part) {
           if (part.text) {
@@ -92,7 +81,7 @@ export default async function (request: VercelRequest, response: VercelResponse)
           if (part.image && typeof part.image === 'string') {
             const match = part.image.match(/^data:(image\/.+);base64,(.+)$/);
             if (match) {
-              parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
+              parts.push({ inlineData: { mimeType: match[1], data: match[2] } } as InlineDataPart);
             }
           }
         }
@@ -163,3 +152,4 @@ export default async function (request: VercelRequest, response: VercelResponse)
     }
   }
 }
+
