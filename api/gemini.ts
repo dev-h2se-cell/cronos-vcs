@@ -1,5 +1,4 @@
 
-
 /// <reference types="node" />
 /* global process */
 import type { VercelRequest, VercelResponse } from '@vercel/node';
@@ -26,6 +25,7 @@ interface ChatRequest {
 export default async function (request: VercelRequest, response: VercelResponse) {
   console.log('[API] --- INICIO DE LA FUNCIÓN ---');
   console.log(`[API] Método de solicitud: ${request.method}`);
+  console.log('[API] Body recibido:', JSON.stringify(request.body, null, 2));
 
   if (request.method !== 'POST') {
     console.log('[API] Método no permitido. Finalizando.');
