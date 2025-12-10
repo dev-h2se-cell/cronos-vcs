@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { Button } from './Button';
 import { Sun, Moon, Sparkles, Droplets, Shield, Zap } from 'lucide-react';
 import { ProductData } from '../types';
