@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ShoppingBag, Sun, Moon, Droplets, Shield, Layers } from 'lucide-react';
+import { useCart } from '../context/CartContext'; // Import useCart
 
 interface NavbarProps {
-  cartCount: number;
   currentView: 'chronos' | 'infinity' | 'hydrolock' | 'shield' | 'protocols';
   onNavigate: (view: 'chronos' | 'infinity' | 'hydrolock' | 'shield' | 'protocols') => void;
+  onOpenCart: () => void; // New prop to open the cart
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ cartCount, currentView, onNavigate }) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, onOpenCart }) => {
+  const { cartItems } = useCart(); // Get cart items from context
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0); // Calculate cart count
+
   const [scrolled, setScrolled] = useState(false);
   const [animateBadge, setAnimateBadge] = useState(false);
-  const prevCartCountRef = useRef(cartCount); // To track previous cartCount
+  const prevCartCountRef = useRef(cartCount);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -20,24 +24,23 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount, currentView, onNaviga
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Animation logic for cartCount change
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
-    let initialSetTimeout: ReturnType<typeof setTimeout> | undefined; // Using ReturnType<typeof setTimeout> for both
+    let initialSetTimeout: ReturnType<typeof setTimeout> | undefined;
 
-    if (cartCount !== prevCartCountRef.current && cartCount > 0) { // Only animate if cartCount *actually changed* and is > 0
+    if (cartCount !== prevCartCountRef.current && cartCount > 0) {
       initialSetTimeout = setTimeout(() => {
         setAnimateBadge(true);
         timer = setTimeout(() => setAnimateBadge(false), 300);
-      }, 0); // Defer to next event loop tick
-    } else if (cartCount === 0) { // If cart is empty, ensure badge is not animating
+      }, 0);
+    } else if (cartCount === 0) {
         setAnimateBadge(false);
     }
-    prevCartCountRef.current = cartCount; // Update ref for next render
+    prevCartCountRef.current = cartCount;
 
     return () => {
       if (initialSetTimeout) clearTimeout(initialSetTimeout);
-      if (timer) clearTimeout(timer); // Clear animation timeout
+      if (timer) clearTimeout(timer);
     };
   }, [cartCount]);
 
@@ -127,11 +130,13 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount, currentView, onNaviga
           </div>
 
           <div className="flex items-center gap-6">
-            <button className="relative group">
+            <button className="relative group" onClick={onOpenCart}>
               <ShoppingBag className={`${themeText} transition-transform group-hover:scale-110`} size={24} strokeWidth={1.5} />
-              <span className={`absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center transition-transform ${animateBadge ? 'scale-125' : 'scale-100'}`}>
-                {cartCount}
-              </span>
+              {cartCount > 0 && (
+                <span className={`absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center transition-transform ${animateBadge ? 'scale-125' : 'scale-100'}`}>
+                  {cartCount}
+                </span>
+              )}
             </button>
           </div>
         </div>

@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react';
 import { Button } from './Button';
 import { Sun, Moon, Sparkles, Droplets, Shield, Zap } from 'lucide-react';
-import { ProductData } from '../types'; // Import necessary types
-import { formatPrice } from '../utils/formatPrice'; // Import formatPrice
+import { ProductData } from '../types';
+import { formatPrice } from '../utils/formatPrice';
+import { useCart } from '../context/CartContext';
 
 interface Props {
-  onAddToCart: (protocol: string) => void;
-  productsData: ProductData; // Added
+  productsData: ProductData;
 }
 
-const ProtocolsScreen: React.FC<Props> = ({ onAddToCart, productsData }) => {
+const ProtocolsScreen: React.FC<Props> = ({ productsData }) => {
+  const { addToCart } = useCart();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -66,7 +66,7 @@ const ProtocolsScreen: React.FC<Props> = ({ onAddToCart, productsData }) => {
                   {protocoloDia.originalPrice && <span className="text-slate-500 text-sm line-through">{formatPrice(protocoloDia.originalPrice)}</span>}
                   <div className="text-2xl font-bold text-slate-900">{formatPrice(protocoloDia.price)}</div>
                 </div>
-                <Button onClick={() => onAddToCart('dia')}>{protocoloDia.ctaText}</Button>
+                <Button onClick={() => addToCart(protocoloDia, 1)}>{protocoloDia.ctaText}</Button>
               </div>
             </div>
             <div className="hidden md:block h-64 bg-gradient-to-br from-cyan-50 to-amber-50 rounded-xl">
@@ -95,7 +95,7 @@ const ProtocolsScreen: React.FC<Props> = ({ onAddToCart, productsData }) => {
                   {protocoloNoche.originalPrice && <span className="text-slate-500 text-sm line-through">{formatPrice(protocoloNoche.originalPrice)}</span>}
                   <div className="text-2xl font-bold text-white">{formatPrice(protocoloNoche.price)}</div>
                 </div>
-                <Button onClick={() => onAddToCart('noche')} variant="secondary" className="bg-purple-600 hover:bg-purple-500">{protocoloNoche.ctaText}</Button>
+                <Button onClick={() => addToCart(protocoloNoche, 1)} variant="secondary" className="bg-purple-600 hover:bg-purple-500">{protocoloNoche.ctaText}</Button>
               </div>
             </div>
             <div className="order-1 md:order-2 hidden md:block h-64 bg-gradient-to-br from-purple-900 to-slate-800 rounded-xl">
@@ -124,7 +124,7 @@ const ProtocolsScreen: React.FC<Props> = ({ onAddToCart, productsData }) => {
                   {protocoloLongevidad.originalPrice && <span className="text-slate-500 text-sm line-through">{formatPrice(protocoloLongevidad.originalPrice)}</span>}
                   <div className="text-2xl font-bold text-white">{formatPrice(protocoloLongevidad.price)}</div>
                 </div>
-                <Button onClick={() => onAddToCart('longevidad')} variant="secondary" className="bg-orange-600 hover:bg-orange-500">{protocoloLongevidad.ctaText}</Button>
+                <Button onClick={() => addToCart(protocoloLongevidad, 1)} variant="secondary" className="bg-orange-600 hover:bg-orange-500">{protocoloLongevidad.ctaText}</Button>
               </div>
             </div>
             <div className="order-1 md:order-2 hidden md:block h-64 bg-gradient-to-br from-orange-800 to-slate-700 rounded-xl">
@@ -148,7 +148,7 @@ const ProtocolsScreen: React.FC<Props> = ({ onAddToCart, productsData }) => {
                 {protocoloUniversal.originalPrice && <span className="text-white/70 text-sm line-through">{formatPrice(protocoloUniversal.originalPrice)}</span>}
                 <div className="text-3xl font-bold text-white">{formatPrice(protocoloUniversal.price)}</div>
               </div>
-              <Button onClick={() => onAddToCart('universal')} size="lg" className="bg-white text-slate-900 hover:bg-slate-200">
+              <Button onClick={() => addToCart(protocoloUniversal, 1)} size="lg" className="bg-white text-slate-900 hover:bg-slate-200">
                 {protocoloUniversal.ctaText}
               </Button>
             </div>

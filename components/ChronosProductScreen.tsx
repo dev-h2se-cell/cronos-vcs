@@ -11,14 +11,15 @@ import { FAQ } from './FAQ';
 import { Button } from './Button';
 import { ProductData } from '../types'; // Import ProductData
 import { formatPrice } from '../utils/formatPrice'; // Import formatPrice
+import { useCart } from '../context/CartContext'; // Import useCart
 
 interface Props {
-  onAddToCart: () => void;
   onNavigateToProtocol: () => void;
   productsData: ProductData; // Added
 }
 
-const ChronosProductScreen: React.FC<Props> = ({ onAddToCart, onNavigateToProtocol, productsData }) => {
+const ChronosProductScreen: React.FC<Props> = ({ onNavigateToProtocol, productsData }) => {
+  const { addToCart } = useCart();
   const chronosProduct = productsData.products.find(p => p.id === 'chronos-c-shield');
 
   const [activeTab, setActiveTab] = useState<'overview' | 'science' | 'routine' | 'offers'>('overview');
@@ -99,8 +100,8 @@ const ChronosProductScreen: React.FC<Props> = ({ onAddToCart, onNavigateToProtoc
         </div>
 
         <div id="offers" className="scroll-mt-40">
-           <Offer onAddToCart={onAddToCart} onNavigateToProtocol={onNavigateToProtocol} productsData={productsData} />
-           <ShopTheRoutine onAddToCart={onAddToCart} productsData={productsData} />
+           <Offer onNavigateToProtocol={onNavigateToProtocol} productsData={productsData} />
+           <ShopTheRoutine productsData={productsData} />
         </div>
       </div>
 
@@ -113,7 +114,7 @@ const ChronosProductScreen: React.FC<Props> = ({ onAddToCart, onNavigateToProtoc
             <div className="text-[10px] text-slate-400 uppercase tracking-wider">{chronosProduct.name}</div>
             <div className="text-xl font-bold text-slate-900">{formatPrice(chronosProduct.price)}</div>
          </div>
-         <Button onClick={onAddToCart} className="py-3 px-8 bg-slate-900 text-white border-0 shadow-lg">
+         <Button onClick={() => addToCart(chronosProduct, 1)} className="py-3 px-8 bg-slate-900 text-white border-0 shadow-lg">
             AÑADIR
          </Button>
       </div>

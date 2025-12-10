@@ -3,14 +3,15 @@ import { ArrowLeft, Flame, Star, Sun, Moon, Clock, CheckCircle2, CreditCard } fr
 import { ProductData } from '../types'; // Import necessary types
 import { formatPrice } from '../utils/formatPrice'; // Import formatPrice
 import { Button } from './Button'; // Import Button component
+import { useCart } from '../context/CartContext'; // Import useCart
 
 interface Props {
   onBack: () => void;
-  onAddToCart: () => void;
   productsData: ProductData; // Added
 }
 
-const LongevityProtocolScreen: React.FC<Props> = ({ onBack, onAddToCart, productsData }) => {
+const LongevityProtocolScreen: React.FC<Props> = ({ onBack, productsData }) => {
+  const { addToCart } = useCart();
   const [timeLeft] = useState(12); // Fake scarcity counter
 
   const longevityProtocol = productsData.protocols.find(p => p.id === 'protocolo-longevidad');
@@ -231,7 +232,7 @@ const LongevityProtocolScreen: React.FC<Props> = ({ onBack, onAddToCart, product
           </div>
 
           <Button 
-            onClick={onAddToCart} 
+            onClick={() => addToCart(longevityProtocol, 1)} 
             fullWidth 
             className="bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-400 hover:to-purple-500 border-0 text-lg py-5 mb-4 animate-pulse shadow-[0_0_20px_rgba(168,85,247,0.4)]"
           >

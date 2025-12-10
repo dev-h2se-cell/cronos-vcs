@@ -2,15 +2,16 @@ import React from 'react';
 import { Button } from '../Button';
 import { RefreshCcw, Sparkles, Layers } from 'lucide-react';
 import { ProductData } from '../../types';
-import { formatPrice } from '../../utils/formatPrice'; // Import formatPrice
+import { formatPrice } from '../../utils/formatPrice';
+import { useCart } from '../../context/CartContext';
 
 interface InvisibleShieldOffersProps {
-  onAddToCart: () => void;
   onNavigateToProtocols: () => void;
-  productsData: ProductData; // Added
+  productsData: ProductData;
 }
 
-export const InvisibleShieldOffers: React.FC<InvisibleShieldOffersProps> = ({ onAddToCart, onNavigateToProtocols, productsData }) => {
+export const InvisibleShieldOffers: React.FC<InvisibleShieldOffersProps> = ({ onNavigateToProtocols, productsData }) => {
+  const { addToCart } = useCart();
   const invisibleShieldProduct = productsData.products.find(p => p.id === 'invisible-shield-spf');
   const chronosProduct = productsData.products.find(p => p.id === 'chronos-c-shield');
   const protocoloDia = productsData.protocols.find(p => p.id === 'protocolo-dia'); // For price reference for Power Pair AM
@@ -31,7 +32,7 @@ export const InvisibleShieldOffers: React.FC<InvisibleShieldOffersProps> = ({ on
             <p className="text-sm text-slate-500 mb-4">{invisibleShieldProduct.longDescription}</p>
             <div className="text-3xl font-bold text-slate-900 mb-6">{formatPrice(invisibleShieldProduct.price)}</div>
           </div>
-          <Button onClick={onAddToCart} variant="outline" fullWidth className="border-slate-300 hover:border-amber-500 hover:text-amber-600">
+          <Button onClick={() => addToCart(invisibleShieldProduct, 1)} variant="outline" fullWidth className="border-slate-300 hover:border-amber-500 hover:text-amber-600">
             AÑADIR AL CARRITO
           </Button>
         </div>
@@ -48,7 +49,7 @@ export const InvisibleShieldOffers: React.FC<InvisibleShieldOffersProps> = ({ on
               <span className="text-3xl font-bold text-amber-700">{formatPrice(invisibleShieldProduct.subscriptionPrice || '0')}</span>
             </div>
           </div>
-          <Button onClick={onAddToCart} fullWidth className="bg-amber-500 hover:bg-amber-600 border-0 text-white">
+          <Button onClick={() => addToCart(invisibleShieldProduct, 1)} fullWidth className="bg-amber-500 hover:bg-amber-600 border-0 text-white">
             SUSCRIBIRSE
           </Button>
         </div>
@@ -76,7 +77,7 @@ export const InvisibleShieldOffers: React.FC<InvisibleShieldOffersProps> = ({ on
               <Button onClick={() => onNavigateToProtocols()} variant="outline" className="border-slate-300 hover:border-orange-500 hover:text-orange-600">
                 VER DETALLES
               </Button>
-              <Button onClick={onAddToCart} className="bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-200 flex-grow">
+              <Button onClick={() => addToCart(protocoloDia, 1)} className="bg-orange-600 hover:bg-orange-700 text-white shadow-lg shadow-orange-200 flex-grow">
                 COMPRAR DÚO
               </Button>
             </div>

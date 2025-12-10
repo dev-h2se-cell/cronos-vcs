@@ -1,18 +1,17 @@
-import React from 'react';
 import { Button } from './Button';
 import { Check, Package, Sparkles, Truck } from 'lucide-react';
-import { ProductData, ProductItem, ProtocolItem, OtherItem } from '../types'; // Import ProductData, ProductItem, ProtocolItem, OtherItem
-
+import { ProductData, ProductItem, ProtocolItem, OtherItem } from '../types';
 import { formatPrice } from '../utils/formatPrice'; // Import formatPrice
+import { useCart } from '../context/CartContext'; // Import useCart
 
 interface OfferProps {
-  onAddToCart: () => void;
-  // onNavigateToRetinal: () => void; // Removed as it's not used in this component
   onNavigateToProtocol: () => void;
-  productsData: ProductData; // Added
+  productsData: ProductData;
 }
 
-export const Offer: React.FC<OfferProps> = ({ onAddToCart, onNavigateToProtocol, productsData }) => {
+export const Offer: React.FC<OfferProps> = ({ onNavigateToProtocol, productsData }) => {
+  const { addToCart } = useCart(); // Get addToCart function
+
   const chronosProduct = productsData.products.find((p: ProductItem) => p.id === 'chronos-c-shield');
   const longevityProtocol = productsData.protocols.find((p: ProtocolItem) => p.id === 'protocolo-longevidad');
   const shippingDetails = productsData.others.find((o: OtherItem) => o.id === 'shipping');
@@ -70,7 +69,7 @@ export const Offer: React.FC<OfferProps> = ({ onAddToCart, onNavigateToProtocol,
                     </li>
                 </ul>
 
-                <Button variant="outline" fullWidth onClick={onAddToCart}>AÑADIR AL CARRITO</Button>
+                <Button variant="outline" fullWidth onClick={() => addToCart(chronosProduct, 1)}>AÑADIR AL CARRITO</Button>
             </div>
 
             {/* Hero Option */}

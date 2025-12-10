@@ -1,16 +1,16 @@
-import React from 'react';
 import { Plus, ArrowRight, Sparkles, Layers } from 'lucide-react';
 import { Button } from './Button';
+import { useCart } from '../context/CartContext'; // Import useCart
 
 import { ProductData } from '../types'; // Import ProductData
 import { formatPrice } from '../utils/formatPrice'; // Import formatPrice
 
 interface Props {
-  onAddToCart: () => void;
   productsData: ProductData; // Added
 }
 
-export const ShopTheRoutine: React.FC<Props> = ({ onAddToCart, productsData }) => {
+export const ShopTheRoutine: React.FC<Props> = ({ productsData }) => {
+  const { addToCart } = useCart();
   const universalProtocol = productsData.protocols.find(p => p.id === 'protocolo-universal');
   const chronosC = productsData.products.find(p => p.id === 'chronos-c-shield');
   const hydroLock = productsData.products.find(p => p.id === 'hydro-lock-serum');
@@ -138,7 +138,7 @@ export const ShopTheRoutine: React.FC<Props> = ({ onAddToCart, productsData }) =
                         {universalProtocol.originalPrice && <div className="text-slate-500 line-through text-lg font-mono">{formatPrice(universalProtocol.originalPrice)}</div>}
                         <div className="text-4xl font-bold text-white tracking-tight">{formatPrice(universalProtocol.price)}</div>
                     </div>
-                    <Button onClick={onAddToCart} fullWidth className="bg-white text-slate-900 hover:bg-slate-100 border-0 py-4 font-bold shadow-lg">
+                    <Button onClick={() => addToCart(universalProtocol, 1)} fullWidth className="bg-white text-slate-900 hover:bg-slate-100 border-0 py-4 font-bold shadow-lg">
                         {universalProtocol.ctaText} <ArrowRight size={18} className="ml-2" />
                     </Button>
                     <div className="flex items-center justify-center gap-2 mt-3 text-[10px] text-slate-400">

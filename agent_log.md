@@ -17,6 +17,33 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
 
 ## Historial de Cambios
 
+### 10/12/2025 - Refactorización y Eliminación del Chatbot
+
+*   **Contexto:** Se solicitó refactorizar el componente del chatbot para mejorar su estructura, basándose en un ejemplo proporcionado (`conserge.tsx`). Durante el proceso de depuración surgieron problemas irresolubles en el entorno local del usuario, lo que llevó a la decisión de eliminar la funcionalidad por completo.
+*   **Cambios Realizados:**
+    1.  **Intento de Refactorización del Chatbot:**
+        *   Se descompuso el `Chatbot.tsx` monolítico en componentes modulares: `Chat.tsx` (estado y orquestación), `MessagesArea.tsx` (renderizado de mensajes) y `ChatInput.tsx` (formulario de entrada).
+        *   Se centralizó la lógica de la API de streaming en un nuevo archivo `utils/chat-api.ts`.
+        *   Se definió un tipo `ChatMessage` más robusto en `types.ts`.
+    2.  **Proceso de Depuración:**
+        *   Se instaló la dependencia `framer-motion` que era necesaria para las animaciones del nuevo chat.
+        *   Se diagnosticó que `npm run dev` (Vite) no ejecutaba las funciones serverless de Vercel, causando un error 404 en `/api/gemini`. Se solucionó añadiendo el script `vercel-dev` a `package.json` y configurando `vercel.json`.
+        *   El error evolucionó a un 500, indicando que la función API se ejecutaba pero fallaba internamente. Se añadieron logs exhaustivos a `api/gemini.ts` para diagnosticar el problema, pero no se pudo obtener el output de la terminal del usuario.
+    3.  **Eliminación Completa del Chatbot:**
+        *   Por solicitud del usuario, se procedió a eliminar toda la funcionalidad del chatbot.
+        *   Se eliminaron los componentes: `Chat.tsx`, `ChatInput.tsx`, `MessagesArea.tsx` y el `Chatbot.tsx` original.
+        *   Se eliminaron los archivos de soporte: `api/gemini.ts` y `utils/chat-api.ts`.
+        *   Se limpiaron los archivos de configuración: se eliminó la interfaz `ChatMessage` de `types.ts`, la propiedad `functions` de `vercel.json` y el script `vercel-dev` de `package.json`.
+        *   Se desinstaló la dependencia `framer-motion`.
+    4.  **Corrección del Botón de WhatsApp:**
+        *   Se detectó que el `WhatsAppButton` había dejado de funcionar correctamente tras la eliminación.
+        *   Se reescribió el componente `WhatsAppButton.tsx` para que funcionara como un botón de acción flotante (FAB) independiente, asegurando su visibilidad y funcionalidad.
+    5.  **Actualización del Repositorio:**
+        *   Se añadieron los archivos no rastreados (`ejemplo conserge.tsx`) al `.gitignore`.
+        *   Se realizó un commit con todos los cambios, resumiendo la eliminación del chatbot y las correcciones.
+        *   Se ejecutó `git push` para enviar los cambios al repositorio remoto y actualizar el despliegue de Vercel.
+*   **Resultado:** Se ha eliminado por completo la funcionalidad del chatbot del proyecto, limpiando todos los archivos, configuraciones y dependencias relacionadas. Se ha restaurado la funcionalidad del botón flotante de WhatsApp y el repositorio se ha sincronizado con los últimos cambios, reflejándolos en el despliegue de Vercel.
+
 ### 05/12/2025 - Auditoría y Puesta a Punto de Proyecto Local
 
 *   **Contexto:** Se solicitó una auditoría del proyecto para asegurar su funcionalidad en entorno local, partiendo de una copia de seguridad que el usuario consideraba 100% funcional. El proyecto había encontrado problemas al usar Vercel CLI.

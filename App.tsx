@@ -16,17 +16,14 @@ const ProtocolsScreen = React.lazy(() => import('./components/ProtocolsScreen'))
 
 import WhatsAppButton from './components/WhatsAppButton';
 import { Footer } from './components/Footer';
+import { Cart } from './components/Cart'; // Import the Cart component
 
 // View type definition
 type AppView = 'chronos' | 'infinity' | 'hydrolock' | 'shield' | 'protocol' | 'protocols';
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('chronos');
-  const [cartCount, setCartCount] = useState(1);
-
-  const handleAddToCart = () => {
-    setCartCount(prev => prev + 1);
-  };
+  const [isCartOpen, setIsCartOpen] = useState(false); // State to control cart visibility
 
   const handleNavigate = (view: AppView) => {
     // Scroll to top when switching views for a fresh feel
@@ -34,13 +31,20 @@ function App() {
     setCurrentView(view);
   };
 
+  const handleOpenCart = () => {
+    setIsCartOpen(true);
+  };
+
+  const handleCloseCart = () => {
+    setIsCartOpen(false);
+  };
+
   // Render content based on current view
   const renderContent = () => {
     if (currentView === 'protocols') {
       return (
         <ProtocolsScreen 
-          onAddToCart={handleAddToCart}
-          productsData={typedProductsData} // Added
+          productsData={typedProductsData}
         />
       );
     }
@@ -49,8 +53,7 @@ function App() {
       return (
         <LongevityProtocolScreen 
           onBack={() => setCurrentView('chronos')}
-          onAddToCart={handleAddToCart}
-          productsData={typedProductsData} // Added
+          productsData={typedProductsData}
         />
       );
     }
@@ -58,10 +61,9 @@ function App() {
     if (currentView === 'infinity') {
       return (
         <RetinalProductPage 
-          onAddToCart={handleAddToCart} 
           onNavigateToProtocol={() => handleNavigate('protocol')} 
           onNavigateToProtocols={() => handleNavigate('protocols')}
-          productsData={typedProductsData} // Added
+          productsData={typedProductsData}
         />
       );
     }
@@ -69,9 +71,8 @@ function App() {
     if (currentView === 'hydrolock') {
       return (
         <HydroLockProductScreen 
-          onAddToCart={handleAddToCart}
           onNavigateToProtocols={() => handleNavigate('protocols')}
-          productsData={typedProductsData} // Added
+          productsData={typedProductsData}
         />
       );
     }
@@ -79,9 +80,8 @@ function App() {
     if (currentView === 'shield') {
       return (
         <InvisibleShieldProductScreen 
-          onAddToCart={handleAddToCart}
           onNavigateToProtocols={() => handleNavigate('protocols')}
-          productsData={typedProductsData} // Added
+          productsData={typedProductsData}
         />
       );
     }
@@ -89,9 +89,8 @@ function App() {
     // Default: Chronos View (Unified Screen)
     return (
       <ChronosProductScreen 
-        onAddToCart={handleAddToCart}
         onNavigateToProtocol={() => handleNavigate('protocol')}
-        productsData={typedProductsData} // Added
+        productsData={typedProductsData}
       />
     );
   };
@@ -109,9 +108,9 @@ function App() {
       {/* Hide standard Navbar on the Sales Page to reduce distractions, or show customized version */}
       {currentView !== 'protocol' && (
         <Navbar 
-          cartCount={cartCount} 
           currentView={getNavbarView()}
           onNavigate={(view) => handleNavigate(view)}
+          onOpenCart={handleOpenCart}
         />
       )}
       
@@ -126,6 +125,7 @@ function App() {
 
       {/* Floating Widgets */}
       <WhatsAppButton />
+      <Cart isOpen={isCartOpen} onClose={handleCloseCart} />
     </div>
   );
 }

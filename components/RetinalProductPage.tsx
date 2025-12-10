@@ -39,7 +39,6 @@ const RetinalProductPage: React.FC<Props> = ({ onAddToCart, onNavigateToProtocol
         <RetinalScience productsData={productsData} />
         <RetinalRoutine productsData={productsData} />
         <RetinalOffers
-          onAddToCart={onAddToCart}
           onNavigateToProtocol={onNavigateToProtocol}
           onNavigateToProtocols={onNavigateToProtocols}
           productsData={productsData}

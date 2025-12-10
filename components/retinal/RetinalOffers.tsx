@@ -1,17 +1,13 @@
-import React from 'react';
-import { Button } from '../Button';
-import { Sparkles, Check, ArrowRight } from 'lucide-react';
-import { ProductData, ProductItem, ProtocolItem, OtherItem } from '../../types'; // Import ProductData, ProductItem, ProtocolItem, OtherItem
-import { formatPrice } from '../../utils/formatPrice';
+import { useCart } from '../../context/CartContext';
 
 interface RetinalOffersProps {
-  onAddToCart: () => void;
   onNavigateToProtocol: () => void;
   onNavigateToProtocols: () => void;
-  productsData: ProductData; // Added
+  productsData: ProductData;
 }
 
-export const RetinalOffers: React.FC<RetinalOffersProps> = ({ onAddToCart, onNavigateToProtocol, onNavigateToProtocols, productsData }) => {
+export const RetinalOffers: React.FC<RetinalOffersProps> = ({ onNavigateToProtocol, onNavigateToProtocols, productsData }) => {
+  const { addToCart } = useCart();
   const retinalProduct = productsData.products.find((p: ProductItem) => p.id === 'infinity-retinal');
   const protocoloNoche = productsData.protocols.find((p: ProtocolItem) => p.id === 'protocolo-noche'); // Corresponds to "Protocolo de Recuperación"
   const protocoloLongevidad = productsData.protocols.find((p: ProtocolItem) => p.id === 'protocolo-longevidad');
@@ -38,7 +34,7 @@ export const RetinalOffers: React.FC<RetinalOffersProps> = ({ onAddToCart, onNav
           </div>
           <div className="text-right">
             <div className="font-bold text-white text-xl">{formatPrice(retinalProduct.price)}</div>
-            <button onClick={onAddToCart} className="text-xs text-purple-400 font-bold hover:text-purple-300">AÑADIR +</button>
+            <button onClick={() => addToCart(retinalProduct, 1)} className="text-xs text-purple-400 font-bold hover:text-purple-300">AÑADIR +</button>
           </div>
         </div>
 
@@ -52,7 +48,7 @@ export const RetinalOffers: React.FC<RetinalOffersProps> = ({ onAddToCart, onNav
           <div className="text-right">
             <div className="font-bold text-white text-xl">{formatPrice(protocoloNoche.price)}</div>
             <button onClick={onNavigateToProtocols} className="text-xs text-purple-400 font-bold hover:text-purple-300 mr-2">VER DETALLES</button>
-            <button onClick={onAddToCart} className="text-xs text-purple-400 font-bold hover:text-purple-300">AÑADIR +</button>
+            <button onClick={() => addToCart(protocoloNoche, 1)} className="text-xs text-purple-400 font-bold hover:text-purple-300">AÑADIR +</button>
           </div>
         </div>
 

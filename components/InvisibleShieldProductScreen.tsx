@@ -37,7 +37,7 @@ const InvisibleShieldProductScreen: React.FC<Props> = ({ onAddToCart, onNavigate
         <InvisibleShieldOverview />
         <InvisibleShieldScience />
         <InvisibleShieldRoutine />
-        <InvisibleShieldOffers onAddToCart={onAddToCart} onNavigateToProtocols={onNavigateToProtocols} productsData={productsData} />
+        <InvisibleShieldOffers onNavigateToProtocols={onNavigateToProtocols} productsData={productsData} />
       </main>
 
       <InvisibleShieldMobileCta onAddToCart={onAddToCart} productsData={productsData} />

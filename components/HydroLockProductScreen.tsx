@@ -37,7 +37,7 @@ const HydroLockProductScreen: React.FC<Props> = ({ onAddToCart, onNavigateToProt
         <HydroLockOverview />
         <HydroLockScience />
         <HydroLockRoutine />
-        <HydroLockOffers onAddToCart={onAddToCart} onNavigateToProtocols={onNavigateToProtocols} productsData={productsData} />
+        <HydroLockOffers onNavigateToProtocols={onNavigateToProtocols} productsData={productsData} />
       </main>
 
       <HydroLockMobileCta onAddToCart={onAddToCart} productsData={productsData} />

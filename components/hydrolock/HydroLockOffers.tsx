@@ -2,15 +2,16 @@ import React from 'react';
 import { Button } from '../Button';
 import { Check, RefreshCcw } from 'lucide-react';
 import { ProductData } from '../../types';
-import { formatPrice } from '../../utils/formatPrice'; // Import formatPrice
+import { formatPrice } from '../../utils/formatPrice';
+import { useCart } from '../../context/CartContext';
 
 interface HydroLockOffersProps {
-  onAddToCart: () => void;
   onNavigateToProtocols: () => void;
-  productsData: ProductData; // Added
+  productsData: ProductData;
 }
 
-export const HydroLockOffers: React.FC<HydroLockOffersProps> = ({ onAddToCart, onNavigateToProtocols, productsData }) => {
+export const HydroLockOffers: React.FC<HydroLockOffersProps> = ({ onNavigateToProtocols, productsData }) => {
+  const { addToCart } = useCart();
   const hydroLockProduct = productsData.products.find(p => p.id === 'hydro-lock-serum');
   const protocoloDia = productsData.protocols.find(p => p.id === 'protocolo-dia');
 
@@ -30,7 +31,7 @@ export const HydroLockOffers: React.FC<HydroLockOffersProps> = ({ onAddToCart, o
             <p className="text-sm text-slate-500 mb-4">Botella de 30ml</p> {/* Keep hardcoded for now */}
             <div className="text-3xl font-bold text-slate-900 mb-6">{formatPrice(hydroLockProduct.price)}</div>
           </div>
-          <Button onClick={onAddToCart} variant="outline" fullWidth className="border-slate-300 hover:border-cyan-500 hover:text-cyan-600">
+          <Button onClick={() => addToCart(hydroLockProduct, 1)} variant="outline" fullWidth className="border-slate-300 hover:border-cyan-500 hover:text-cyan-600">
             AÑADIR AL CARRITO
           </Button>
         </div>
@@ -54,7 +55,7 @@ export const HydroLockOffers: React.FC<HydroLockOffersProps> = ({ onAddToCart, o
               <li className="flex items-center gap-2 text-xs text-slate-600"><Check size={12} className="text-cyan-500"/> Nunca te quedes sin tu base</li>
             </ul>
           </div>
-          <Button onClick={onAddToCart} fullWidth className="bg-cyan-600 hover:bg-cyan-700 border-0 text-white">
+          <Button onClick={() => addToCart(hydroLockProduct, 1)} fullWidth className="bg-cyan-600 hover:bg-cyan-700 border-0 text-white">
             SUSCRIBIRSE AHORA
           </Button>
         </div>
@@ -66,7 +67,7 @@ export const HydroLockOffers: React.FC<HydroLockOffersProps> = ({ onAddToCart, o
             <p className="text-sm text-slate-500 mb-4">{protocoloDia.description}</p>
             <div className="text-3xl font-bold text-slate-900 mb-6">{formatPrice(protocoloDia.price)}</div>
           </div>
-          <Button onClick={onAddToCart} variant="primary" fullWidth className="bg-slate-800 text-white">
+          <Button onClick={() => addToCart(protocoloDia, 1)} variant="primary" fullWidth className="bg-slate-800 text-white">
             AÑADIR KIT
           </Button>
         </div>
@@ -81,7 +82,7 @@ export const HydroLockOffers: React.FC<HydroLockOffersProps> = ({ onAddToCart, o
             <Button onClick={() => onNavigateToProtocols()} variant="outline" fullWidth className="border-slate-300 hover:border-blue-500 hover:text-blue-600">
               VER DETALLES
             </Button>
-            <Button onClick={onAddToCart} fullWidth className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button onClick={() => addToCart(protocoloDia, 1)} fullWidth className="bg-blue-600 hover:bg-blue-700 text-white">
               AÑADIR
             </Button>
           </div>
