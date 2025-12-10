@@ -14,8 +14,7 @@ const InvisibleShieldProductScreen = React.lazy(() => import('./components/Invis
 const ProtocolsScreen = React.lazy(() => import('./components/ProtocolsScreen'));
 // --- End Code Splitting ---
 
-import { Chatbot } from './components/Chatbot';
-import { WhatsAppButton } from './components/WhatsAppButton';
+import WhatsAppButton from './components/WhatsAppButton';
 import { Footer } from './components/Footer';
 
 // View type definition
@@ -127,7 +126,6 @@ function App() {
 
       {/* Floating Widgets */}
       <WhatsAppButton />
-      <Chatbot />
     </div>
   );
 }

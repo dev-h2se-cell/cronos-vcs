@@ -69,11 +69,42 @@ export interface OtherItem {
   price?: string; // Optional, for items like guides that have a price
 }
 
+
+
+
+
+
+
 /**
+
+
+
  * Main interface for the entire products.json data structure.
+
+
+
  */
+
+
+
 export interface ProductData {
+
+
+
   products: ProductItem[];
+
+
+
   protocols: ProtocolItem[];
+
+
+
   others: OtherItem[];
+
+
+
 }
+
+
+
+
