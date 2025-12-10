@@ -2,5 +2,10 @@
   "buildCommand": "vite build",
   "outputDirectory": "dist",
   "devCommand": "vite",
-  "framework": "vite"
+  "framework": "vite",
+  "functions": {
+    "api/**/*.ts": {
+      "memory": 1024
+    }
+  }
 }

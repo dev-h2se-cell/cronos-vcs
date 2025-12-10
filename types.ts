@@ -75,7 +75,19 @@ export interface OtherItem {
 
 
 
+
+
+
+
+
+
+
+
 /**
+
+
+
+
 
 
 
@@ -83,7 +95,15 @@ export interface OtherItem {
 
 
 
+
+
+
+
  */
+
+
+
+
 
 
 
@@ -91,7 +111,15 @@ export interface ProductData {
 
 
 
+
+
+
+
   products: ProductItem[];
+
+
+
+
 
 
 
@@ -99,11 +127,83 @@ export interface ProductData {
 
 
 
+
+
+
+
   others: OtherItem[];
 
 
 
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export interface ChatMessage {
+
+
+
+
+
+
+
+  id: string;
+
+
+
+
+
+
+
+  role: 'user' | 'model';
+
+
+
+
+
+
+
+  content: string | React.ReactNode;
+
+
+
+
+
+
+
+  image?: string; // To hold the base64 image for the user message
+
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
 
 
 

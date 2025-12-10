@@ -17,6 +17,45 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
 
 ## Historial de Cambios
 
+### 10/12/2025 - Reconstrucción del Chatbot (Sin Interacción con el Carrito)
+
+*   **Contexto:** Tras la eliminación previa del chatbot, se decidió reconstruirlo con una visión más clara de sus roles (curador experto, vendedor/concierge) y, crucialmente, eliminando cualquier interacción con la funcionalidad del carrito de compras para evitar conflictos anteriores.
+*   **Cambios Realizados:**
+    1.  **Recreación de Archivos del Chatbot:**
+        *   Se recreó `api/gemini.ts` con logging mejorado y un `systemPrompt` ajustado para eliminar cualquier referencia a acciones de carrito.
+        *   Se recrearon los componentes frontend: `components/Chat.tsx` (main), `components/ChatInput.tsx`, `components/MessagesArea.tsx` y `components/WhatsAppButtonChat.tsx` (para uso interno del chat).
+        *   Se recreó el archivo de utilidad `utils/chat-api.ts`.
+        *   Se añadió la interfaz `ChatMessage` de nuevo a `types.ts`.
+    2.  **Configuración de Dependencias y Scripts:**
+        *   Se reinstaló la dependencia `framer-motion`.
+        *   Se añadió el script `vercel-dev` a `package.json`.
+        *   Se añadió la propiedad `functions` a `vercel.json` para que Vercel reconozca y sirva la ruta `api/gemini.ts`.
+    3.  **Integración en `App.tsx`:**
+        *   Se integró el componente `Chat` en `App.tsx` como un botón flotante debajo del botón de WhatsApp existente, con su propia lógica de apertura y cierre.
+*   **Resultado:** El chatbot ha sido completamente reconstruido e integrado en la aplicación, enfocado en sus roles de experto y concierge, sin ninguna interacción con el carrito de compras. El entorno está preparado para una depuración sistemática si surgen nuevos errores 500.
+
+### 10/12/2025 - Implementación del Carrito de Compras con Redirección a WhatsApp
+
+*   **Contexto:** Se implementó una nueva funcionalidad de carrito de compras que, en lugar de integrarse con una pasarela de pago, redirige al usuario a WhatsApp con un resumen del pedido pre-llenado.
+*   **Cambios Realizados:**
+    1.  **Diseño e Interfaz del Carrito:**
+        *   Se creó el componente `components/Cart.tsx` como un panel lateral, incluyendo la UI para mostrar los artículos, ajustar cantidades y el botón de finalizar pedido.
+    2.  **Gestión Global del Estado del Carrito:**
+        *   Se implementó un `CartContext` en `context/CartContext.tsx` utilizando la API de Context de React para gestionar el estado del carrito a nivel global.
+        *   Se creó un `CartProvider` para envolver la aplicación (`index.tsx`) y un `useCart` hook para acceder al contexto.
+    3.  **Funcionalidad "Añadir al Carrito":**
+        *   Se modificaron todos los botones "Añadir al Carrito" existentes en los componentes de ofertas y productos (`Offer.tsx`, `RetinalOffers.tsx`, `HydroLockOffers.tsx`, `InvisibleShieldOffers.tsx`, `LongevityProtocolScreen.tsx`, `ProtocolsScreen.tsx`, `ShopTheRoutine.tsx`) para utilizar la función `addToCart` del `useCart` hook, pasando el producto/protocolo y la cantidad correcta.
+        *   Se eliminó la prop `onAddToCart` de estos componentes y de sus padres (`ChronosProductScreen.tsx`, `RetinalProductPage.tsx`, `HydroLockProductScreen.tsx`, `InvisibleShieldProductScreen.tsx`, `App.tsx`), simplificando el flujo de datos.
+    4.  **Función "Finalizar Pedido por WhatsApp":**
+        *   Se implementó la lógica `handleCheckout` en `components/Cart.tsx` para generar un mensaje de resumen detallado del carrito y construir un enlace de WhatsApp dinámico, abriéndolo en una nueva pestaña.
+        *   El carrito se vacía automáticamente tras la redirección.
+    5.  **Integración con la Barra de Navegación:**
+        *   Se modificó `components/Navbar.tsx` para utilizar `useCart`, mostrar el número actual de artículos en el carrito y un botón para abrir/cerrar el panel del carrito.
+        *   Se añadió el estado `isCartOpen` a `App.tsx` para controlar la visibilidad del carrito, y se pasaron las props necesarias al `Navbar` y al `Cart` componente.
+    6.  **Correcciones Post-Refactorización:**
+        *   Se corrigieron `ReferenceError: formatPrice is not defined` en `Offer.tsx` y `ReferenceError: Plus is not defined` en `ShopTheRoutine.tsx` re-añadiendo las importaciones faltantes.
+*   **Resultado:** La aplicación ahora cuenta con un carrito de compras completamente funcional y una integración perfecta con WhatsApp para la finalización de pedidos, mejorando la experiencia del usuario y optimizando el proceso de venta.
+
 ### 10/12/2025 - Refactorización y Eliminación del Chatbot
 
 *   **Contexto:** Se solicitó refactorizar el componente del chatbot para mejorar su estructura, basándose en un ejemplo proporcionado (`conserge.tsx`). Durante el proceso de depuración surgieron problemas irresolubles en el entorno local del usuario, lo que llevó a la decisión de eliminar la funcionalidad por completo.
