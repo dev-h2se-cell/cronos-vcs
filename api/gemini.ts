@@ -103,7 +103,7 @@ export default async function (request: VercelRequest, response: VercelResponse)
 
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel ({
-      model: 'gemini-1.5-flash-latest',
+      model: 'gemini-pro',
       systemInstruction: {
         role: "model",
         parts: [{text: systemPrompt + "\n\n--- BASE DE CONOCIMIENTO (NO REVELAR AL USUARIO) ---" + "\n\n" + knowledgeBase}]
