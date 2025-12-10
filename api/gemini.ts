@@ -129,8 +129,16 @@ export default async function (request: VercelRequest, response: VercelResponse)
     response.setHeader('Transfer-Encoding', 'chunked');
     console.log('[API] Headers de respuesta configurados para streaming.');
 
+    const chatHistoryForStart = historyForApi.slice(0, -1);
+    
+    // FIX: Filter out leading model messages to ensure history starts with 'user'
+    const firstUserIndex = chatHistoryForStart.findIndex(m => m.role === 'user');
+    const cleanedHistory = firstUserIndex > -1 ? chatHistoryForStart.slice(firstUserIndex) : [];
+    console.log('[API] Historial de chat para startChat (limpiado):', JSON.stringify(cleanedHistory, null, 2));
+
+
     const chat = model.startChat ({
-        history: historyForApi.slice(0, -1),
+        history: cleanedHistory,
         generationConfig,
         safetySettings,
     });
