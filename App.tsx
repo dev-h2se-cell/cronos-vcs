@@ -18,7 +18,6 @@ import WhatsAppButton from './components/WhatsAppButton';
 import { Footer } from './components/Footer';
 import { Cart } from './components/Cart'; // Import the Cart component
 import Chat from './components/Chat'; // Import the Chatbot component
-import { MessageSquare } from 'lucide-react'; // For chatbot toggle icon
 
 // View type definition
 type AppView = 'chronos' | 'infinity' | 'hydrolock' | 'shield' | 'protocol' | 'protocols';
@@ -26,7 +25,6 @@ type AppView = 'chronos' | 'infinity' | 'hydrolock' | 'shield' | 'protocol' | 'p
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('chronos');
   const [isCartOpen, setIsCartOpen] = useState(false); // State to control cart visibility
-  const [isChatOpen, setIsChatOpen] = useState(false); // State to control chatbot visibility
 
   const handleNavigate = (view: AppView) => {
     // Scroll to top when switching views for a fresh feel
@@ -40,14 +38,6 @@ function App() {
 
   const handleCloseCart = () => {
     setIsCartOpen(false);
-  };
-
-  const handleOpenChat = () => {
-    setIsChatOpen(true);
-  };
-
-  const handleCloseChat = () => {
-    setIsChatOpen(false);
   };
 
   // Render content based on current view
@@ -136,18 +126,11 @@ function App() {
 
       {/* Floating Widgets */}
       <WhatsAppButton />
-      {/* Chatbot Toggle Button */}
-      <button
-        onClick={handleOpenChat}
-        className="fixed bottom-6 right-6 z-50 p-4 bg-slate-900 text-white rounded-full shadow-2xl hover:bg-slate-800 transition-all duration-300 hover:scale-110 border border-slate-700"
-      >
-        <MessageSquare size={24} />
-      </button>
-
       <Cart isOpen={isCartOpen} onClose={handleCloseCart} />
-      <Chat isOpen={isChatOpen} onClose={handleCloseChat} />
+      <Chat />
     </div>
   );
 }
+
 
 export default App;
