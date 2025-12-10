@@ -1,4 +1,8 @@
 import { useCart } from '../../context/CartContext';
+import { formatPrice } from '../../utils/formatPrice';
+import type { ProductData, ProductItem, ProtocolItem, OtherItem } from '../../types';
+import { Button } from '../Button';
+import { Check, Sparkles, ArrowRight } from 'lucide-react';
 
 interface RetinalOffersProps {
   onNavigateToProtocol: () => void;
