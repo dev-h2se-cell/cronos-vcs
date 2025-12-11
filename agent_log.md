@@ -17,6 +17,73 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
 
 ## Historial de Cambios
 
+### 10/12/2025 - Resolución de Error CSP (`unsafe-eval`)
+
+*   **Contexto:** Se reportó un error de Content Security Policy (CSP) en producción, que bloqueaba el uso de `eval()` y `unsafe-eval`, impidiendo el correcto funcionamiento de scripts.
+*   **Análisis del Problema:** La CSP era aplicada por Vercel por defecto.
+*   **Cambios Realizados:** Se modificó `vercel.json` para añadir una sección `headers` personalizada. Esta nueva cabecera `Content-Security-Policy` permite `default-src 'self'`, `script-src 'self' 'unsafe-eval'`, `style-src 'self' 'unsafe-inline'`, entre otras directivas, sobreescribiendo la política predeterminada de Vercel.
+*   **Resultado:** Se espera que el error de CSP se resuelva, permitiendo la ejecución de scripts que puedan requerir `unsafe-eval`.
+
+### 10/12/2025 - Diagnóstico de Disponibilidad de Modelos de IA
+
+*   **Contexto:** A pesar de múltiples intentos y cambios de modelo (`gemini-1.5-flash-latest`, `gemini-pro`, `gemini-1.0-pro`), persistía un error `404 Not Found` de la API de Google al intentar acceder a los modelos. Esto sugería un problema con la clave de API o la configuración de Google Cloud.
+*   **Cambios Realizados:** Se modificó temporalmente `api/gemini.ts` para que, en lugar de intentar chatear, realizara una llamada a `genAI.listModels()` y devolviera la lista de modelos de IA disponibles para la clave configurada.
+*   **Resultado:** Se preparó el entorno para obtener un diagnóstico definitivo sobre los modelos a los que la `GEMINI_API_KEY` tiene acceso.
+
+### 10/12/2025 - Corrección `ReferenceError: useEffect is not defined` en `ProtocolsScreen.tsx`
+
+*   **Contexto:** Se reportó un error `Uncaught ReferenceError: useEffect is not defined` en `ProtocolsScreen.tsx`, impidiendo la carga de la pantalla de protocolos.
+*   **Análisis del Problema:** El hook `useEffect` se utilizaba en el componente sin haber sido importado explícitamente desde React.
+*   **Cambios Realizados:** Se añadió `import React, { useEffect } from 'react';` al principio del archivo `components/ProtocolsScreen.tsx`.
+*   **Resultado:** La pantalla de protocolos ahora debería cargarse correctamente.
+
+### 10/12/2025 - Corrección `ReferenceError: formatPrice is not defined` en `RetinalOffers.tsx`
+
+*   **Contexto:** Se reportó un error `ReferenceError: formatPrice is not defined` en `RetinalProductPage` (originado en `RetinalOffers.tsx`), impidiendo la carga de la pantalla de producto Retinal.
+*   **Análisis del Problema:** La función `formatPrice` y otras dependencias (tipos, componentes de UI, iconos) se utilizaban en `RetinalOffers.tsx` sin haber sido importadas.
+*   **Cambios Realizados:** Se añadieron todas las importaciones faltantes (`formatPrice` desde `../../utils/formatPrice`, tipos desde `../../types`, `Button` desde `../Button`, y `Check`, `Sparkles`, `ArrowRight` desde `lucide-react`) al principio del archivo `components/retinal/RetinalOffers.tsx`.
+*   **Resultado:** La pantalla de producto Retinal ahora debería cargarse correctamente.
+
+### 10/12/2025 - Inclusión de Imagen `bundle-protocol.jpg`
+
+*   **Contexto:** Se detectó un error `404 Not Found` para la imagen `bundle-protocol.jpg`, que era referenciada en `products.json` para el producto "Protocolo Longevidad".
+*   **Análisis del Problema:** La imagen no existía en el directorio `public/images/`.
+*   **Cambios Realizados:** Se generó un prompt para la creación de la imagen. El usuario proporcionó la imagen, la cual fue añadida al directorio `public/images/` y luego añadida al control de versiones de Git.
+*   **Resultado:** La imagen del "Protocolo Longevidad" ahora se carga correctamente.
+
+### 10/12/2025 - Configuración de Versión de Node.js para Vercel
+
+*   **Contexto:** Se configuró inicialmente `package.json` para usar Node.js `v25.2.1`, pero Vercel no soportaba esta versión, resultando en fallos de despliegue.
+*   **Análisis del Problema:** Vercel requería una versión de Node.js en el rango `24.x`.
+*   **Cambios Realizados:** Se actualizó el campo `engines.node` en `package.json` de `"25.2.1"` a `"24.x"`. Se instruyó al usuario para que actualizara su entorno local de Node.js a una versión `24.x` usando `nvm` para mantener la coherencia.
+*   **Resultado:** Los despliegues en Vercel ahora deberían realizarse sin errores de versión de Node.js, y el entorno local del usuario coincide con el de producción.
+
+### 10/12/2025 - Actualización de Modelos de IA en `api/gemini.ts` (Múltiples Intentos)
+
+*   **Contexto:** Se reportó un `500 Internal Server Error` en la API del chatbot (`/api/gemini`), con el mensaje de Google Generative AI API indicando que el modelo no era encontrado.
+*   **Análisis del Problema:** El error parecía ser que el nombre del modelo de IA era incorrecto o no estaba disponible para la clave de API. Se probaron `gemini-1.5-flash-latest`, `gemini-pro` y `gemini-1.0-pro`.
+*   **Cambios Realizados:**
+    1.  Se cambió el modelo de `gemini-1.5-flash-latest` a `gemini-pro`.
+    2.  Se cambió el modelo de `gemini-pro` a `gemini-1.0-pro`.
+*   **Resultado:** Los cambios no resolvieron el error `404 Not Found` en la API de Google, lo que apunta a un problema con la clave de API o la configuración del proyecto en Google Cloud.
+
+### 10/12/2025 - Configuración Inicial de Versión de Node.js
+
+*   **Contexto:** El usuario solicitó configurar el proyecto para usar Node.js `v25.2.1` y se reportaron problemas relacionados con la versión.
+*   **Cambios Realizados:** Se añadió el campo `engines.node` con el valor `"25.2.1"` al archivo `package.json`.
+*   **Resultado:** El proyecto ahora declara la versión de Node.js esperada, ayudando a las herramientas de desarrollo y despliegue.
+
+### 10/12/2025 - Depuración Inicial de la API del Chatbot (`404 Not Found`)
+
+*   **Contexto:** Se recibió un error `404 Not Found` al intentar acceder a la API del chatbot (`/api/gemini`) en el entorno de desarrollo local.
+*   **Análisis del Problema:** El servidor de desarrollo de Vite no estaba ejecutando las funciones serverless de Vercel.
+*   **Cambios Realizados:**
+    1.  Se verificó la existencia del script `vercel-dev` en `package.json`.
+    2.  Se instruyó al usuario para usar `npm run vercel-dev` para iniciar el servidor de desarrollo, lo que permite a Vercel CLI ejecutar correctamente las funciones serverless.
+    3.  Se eliminó el bloque `functions` de `vercel.json` (que había sido reintroducido tras la eliminación anterior del chatbot) para permitir el enrutamiento automático de Vercel.
+    4.  Se modificó temporalmente `api/gemini.ts` para verificar si se estaban generando logs en la terminal de `vercel dev`.
+*   **Resultado:** Se resolvió el error `404 Not Found` para la API del chatbot, permitiendo que la función se invocara, aunque luego generara un `500 Internal Server Error`.
+
 ### 10/12/2025 - Reconstrucción del Chatbot (Sin Interacción con el Carrito)
 
 *   **Contexto:** Tras la eliminación previa del chatbot, se decidió reconstruirlo con una visión más clara de sus roles (curador experto, vendedor/concierge) y, crucialmente, eliminando cualquier interacción con la funcionalidad del carrito de compras para evitar conflictos anteriores.
@@ -166,94 +233,6 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
     4.  **Resolución de Errores Estructurales:**
         *   Se corrigieron múltiples errores de "Unexpected export" que surgieron durante el proceso de refactorización en `components/ProtocolsScreen.tsx`, `components/LongevityProtocolScreen.tsx`, `components/Offer.tsx`, `components/hydrolock/HydroLockOffers.tsx`, `components/hydrolock/HydroLockMobileCta.tsx`, `components/retinal/RetinalMobileCta.tsx` y `components/retinal/RetinalOffers.tsx`. Estos errores eran causados por la duplicación accidental de la declaración del componente durante operaciones de reemplazo masivas.
 *   **Resultado:** El proyecto ahora utiliza una fuente centralizada para todo el contenido de productos y ofertas, lo que facilita enormemente las futuras actualizaciones. La calidad del código TypeScript ha mejorado, y la configuración de construcción de Tailwind CSS es más eficiente. La aplicación se compila correctamente sin errores ni advertencias de configuración.
-
-### 01/12/2025 - Implementación de Estrategia Híbrida de Ventas Cruzadas (Cross-Selling)
-
-*   **Tarea:** Implementar una estrategia híbrida de ventas cruzadas para los Protocolos Día, Noche y Universal, utilizando una página centralizada y enlaces contextuales.
-*   **Contexto:** El usuario solicitó ideas para manejar las ventas cruzadas y aprobó un plan híbrido que combinaba lo mejor de varias estrategias propuestas.
-*   **Cambios Realizados:**
-    1.  **Creación de `ProtocolsScreen.tsx`:** Se desarrolló un nuevo componente (`components/ProtocolsScreen.tsx`) que sirve como página central para presentar y vender los protocolos Día, Noche y Universal, con sus respectivas descripciones, productos y precios.
-    2.  **Integración en `App.tsx`:** Se añadió el tipo de vista `'protocols'` a `AppView` y se configuró el lazy-loading y el renderizado de `ProtocolsScreen` cuando se selecciona esta vista.
-    3.  **Integración en `Navbar.tsx`:** Se actualizó `NavbarProps` para incluir la vista `'protocols'` y se añadió un botón/enlace "Protocols" en la barra de navegación para permitir el acceso a la nueva página.
-    4.  **Vinculación desde Ofertas Individuales:**
-        *   Se añadió la prop `onNavigateToProtocols` a `HydroLockOffers.tsx`, `RetinalOffers.tsx` e `InvisibleShieldOffers.tsx`.
-        *   Se añadió un botón "Ver Detalles" a las ofertas relevantes en cada uno de estos componentes (ej. "Rutina AM (Power Pair)" en Hydro-Lock, "Protocolo de Recuperación" en Retinal, "POWER PAIR AM" en Invisible Shield).
-        *   Estos botones invocan `onNavigateToProtocols` para dirigir al usuario a la página central de Protocols.
-        *   Se actualizó los componentes `HydroLockProductScreen.tsx`, `RetinalProductPage.tsx` e `InvisibleShieldProductScreen.tsx` para pasar la prop `onNavigateToProtocols` a sus respectivos componentes de ofertas.
-        *   Finalmente, `App.tsx` fue actualizado para pasar `handleNavigate('protocols')` a cada una de estas páginas de productos.
-    5.  **Actualización de `ShopTheRoutine.tsx`:** Se transformó este componente (ubicado en la página de Chronos-C) para representar el "Protocolo Universal 24h". Se actualizó el título, la descripción, el flujo visual para incluir los 4 productos (Chronos-C, Hydro-Lock, Invisible Shield, Infinity Retinal) y los precios finales a $450.000 (con precio tachado de $480.000).
-*   **Resultado:** La aplicación ahora cuenta con una estrategia de ventas cruzadas implementada que guía a los usuarios a través de los diferentes protocolos y ofrece un acceso centralizado a las rutinas completas.
-
-### 01/12/2025 - Actualización de Protocolo Día y Noche en `LongevityProtocolScreen.tsx`
-
-*   **Tarea:** Corregir inconsistencias en la definición de los protocolos de día y noche en la página `LongevityProtocolScreen.tsx`, incluyendo la asignación de Chronos-C al protocolo nocturno y la actualización de descripciones.
-*   **Contexto:** El usuario reportó que la página de "Protocolo de Longevidad" tenía una descripción incoherente del uso de la Vitamina C (Chronos-C) y precios no actualizados a COP.
-*   **Cambios Realizados:**
-    1.  **Revisión del Uso de Chronos-C:** Se mantuvo "Chronos-C (Noche)" en la lista de items del kit, alineándose con la nueva definición del usuario para el protocolo nocturno. (Nota: La modificación a "(Mañana)" no se aplicó tras recibir la nueva instrucción del usuario).
-    2.  **Actualización de "Ciencia Circadiana" - Modo Defensa AM:**
-        *   Se modificó la descripción para indicar que `Hydro-Lock Serum` e `Invisible Shield SPF` son los productos del protocolo de día, protegiendo e hidratando la piel.
-        *   Se cambió el color del círculo indicador de `orange-500` a `cyan-500`.
-    3.  **Actualización de "Ciencia Circadiana" - Modo Reparación PM:**
-        *   Se modificó la descripción para indicar que `Infinity Retinal` y `Chronos-C Shield` trabajan en sinergia para la reparación y renovación nocturna.
-        *   Se cambió el color del círculo indicador de `purple-600` a `orange-500` (reflejando el color de Chronos-C).
-    4.  **Actualización de Precios:** Se actualizaron todos los precios en la sección "¿Qué Incluye el Kit?" y en la "Oferta Exclusiva" final a Pesos Colombianos, según los cálculos previos:
-        *   Chronos-C Shield™: $110.000 (tachado)
-        *   Infinity Retinal Night: $150.000 (tachado)
-        *   Guía Skin Streaming (Gratis): $50.000 (tachado)
-        *   Oferta Exclusiva (Bundle): $270.000 (precio original tachado $370.000)
-*   **Resultado:** La página `LongevityProtocolScreen.tsx` ahora presenta información coherente y precios actualizados para los protocolos de día y noche.
-
-### 01/12/2025 - Creación de Copia de Seguridad del Proyecto
-
-*   **Tarea:** Crear una copia de seguridad completa del proyecto.
-*   **Contexto:** Solicitud explícita del usuario para crear un respaldo.
-*   **Cambios Realizados:** Se ejecutó el comando `Compress-Archive` para empaquetar todo el directorio del proyecto.
-*   **Ubicación del Archivo:** La copia de seguridad se encuentra en `C:\aht\trabajo\h2\caliope\web\` y el nombre del archivo sigue el formato `chronos-c-shield_backup_YYYYMMDD_HHMMSS.zip`.
-*   **Resultado:** Se generó un archivo ZIP con una copia completa del proyecto, ubicado fuera del directorio del proyecto para mayor seguridad.
-
-### 01/12/2025 - Resolución de Problema de Imágenes del Slider Antes/Después
-
-*   **Tarea:** Corregir el problema de desalineación de imágenes en el `BeforeAfterSlider.tsx` y restaurar la funcionalidad del slider tras la eliminación accidental de la carpeta de imágenes.
-*   **Contexto:** Se había diagnosticado que las imágenes originales no tenían dimensiones idénticas. Posteriormente, el usuario eliminó accidentalmente el directorio `public/images/`.
-*   **Cambios Realizados:**
-    1.  **Generación de Prompts:** Se generaron prompts detallados para las imágenes "antes" y "después" (`retinal-before.jpeg`, `retinal-after.jpeg`) incluyendo especificaciones exactas de dimensiones (1024x1024px) para asegurar una alineación perfecta.
-    2.  **Recreación de Directorio:** Se recreó el directorio `public/images/`.
-    3.  **Actualización de Referencias:** Se actualizaron las referencias de las imágenes en `components/retinal/RetinalOverview.tsx` de `.png` a `.jpeg`.
-    4.  **Verificación:** Se solicitó al usuario re-subir las imágenes con las nuevas especificaciones y verificar la funcionalidad del slider.
-*   **Resultado:** El `BeforeAfterSlider` funciona correctamente con imágenes alineadas y correctamente referenciadas.
-
-### 01/12/2025 - Actualización de Precios a Pesos Colombianos (COP)
-
-*   **Tarea:** Actualizar todos los precios de productos y bundles en la aplicación a Pesos Colombianos (COP), basándose en precios individuales proporcionados y extrapolando descuentos para kits.
-*   **Contexto:** El usuario solicitó un cambio de divisa y valores específicos para productos individuales, pidiendo mantener la lógica de descuento en los bundles.
-*   **Cambios Realizados:**
-    1.  **Cálculo de Precios:** Se calcularon los nuevos precios de los bundles y suscripciones aplicando los porcentajes de descuento históricos a los nuevos precios individuales en COP.
-    2.  **Actualización de `components/retinal/RetinalOffers.tsx`:** Se actualizó el precio del "Solo Serum" (Retinal) a $150.000 y los bundles "Protocolo de Recuperación" a $250.000 y "PROTOCOLO DE LONGEVIDAD" a $270.000 (con precio anterior tachado de $370.000).
-    3.  **Actualización de `components/hydrolock/HydroLockOffers.tsx`:** Se actualizaron los precios del "Solo Serum" (Hydro-Lock) a $110.000, la suscripción a $92.000 (con precio anterior tachado de $110.000), "Kit de Barrera (SOS)" a $210.000 y "Rutina AM (Power Pair)" a $210.000).
-    4.  **Actualización de `components/invisibleshield/InvisibleShieldOffers.tsx`:** Se actualizaron los precios del "Solo Escudo" (Invisible Shield) a $110.000, la suscripción a $87.000 (con precio anterior tachado de $110.000) y "POWER PAIR AM" a $200.000 (con precio anterior tachado de $220.000).
-    5.  **Actualización de `components/Offer.tsx` (Chronos-C):** Se actualizó el precio del "El Iniciado" (Chronos-C individual) a $110.000 y el "PROTOCOLO DE LONGEVIDAD" (Chronos-C + Retinal) a $250.000 (con precio anterior tachado de $260.000). Se añadió una función `formatPrice` para formatear los precios como COP.
-    6.  **Actualización de `components/ShopTheRoutine.tsx` (Chronos-C bundle):** Se actualizó el precio del "Kit 'Glow de Mañana'" a $280.000 (con precio anterior tachado de $330.000).
-*   **Resultado:** Todos los precios en la aplicación ahora se muestran en Pesos Colombianos, con los bundles reflejando descuentos calculados.
-
-### 01/12/2025 - Refactorización de Páginas de Productos Monolíticas a Modular
-
-*   **Tarea:** Refactorizar las páginas de productos monolíticas (`RetinalProductPage.tsx`, `HydroLockProductScreen.tsx`, `InvisibleShieldProductScreen.tsx`) a una estructura modular, manteniendo la individualidad de cada página.
-*   **Contexto:** Un análisis previo reveló inconsistencias arquitectónicas, con `ChronosProductScreen` siendo modular y las demás monolíticas, lo que generaba duplicación de código (ej. lógica de scroll).
-*   **Cambios Realizados:**
-    1.  **Creación de `useScrollToSection` Hook:** Se desarrolló un hook personalizado (`hooks/useScrollToSection.ts`) para centralizar y reutilizar la lógica de scroll-spy y smooth scroll, eliminando su duplicación en las páginas de productos.
-    2.  **Modularización de `RetinalProductPage.tsx`:**
-        *   Se creó el directorio `components/retinal/`.
-        *   Se extrajeron las secciones de la página en componentes específicos (`RetinalHero.tsx`, `RetinalTabs.tsx`, `RetinalOverview.tsx`, `RetinalScience.tsx`, `RetinalRoutine.tsx`, `RetinalOffers.tsx`, `RetinalMobileCta.tsx`).
-        *   `RetinalProductPage.tsx` fue reescrito como una composición de estos nuevos módulos, utilizando `useScrollToSection`.
-    3.  **Modularización de `HydroLockProductScreen.tsx`:**
-        *   Se creó el directorio `components/hydrolock/`.
-        *   Se extrajeron las secciones de la página en componentes específicos (`HydroLockHero.tsx`, `HydroLockTabs.tsx`, `HydroLockOverview.tsx`, `HydroLockScience.tsx`, `HydroLockRoutine.tsx`, `HydroLockOffers.tsx`, `HydroLockMobileCta.tsx`).
-        *   `HydroLockProductScreen.tsx` fue reescrito como una composición de estos nuevos módulos, utilizando `useScrollToSection`.
-    4.  **Modularización de `InvisibleShieldProductScreen.tsx`:**
-        *   Se creó el directorio `components/invisibleshield/`.
-        *   Se extrajeron las secciones de la página en componentes específicos (`InvisibleShieldHero.tsx`, `InvisibleShieldTabs.tsx`, `InvisibleShieldOverview.tsx`, `InvisibleShieldScience.tsx`, `InvisibleShieldRoutine.tsx`, `InvisibleShieldOffers.tsx`, `InvisibleShieldMobileCta.tsx`).
-        *   `InvisibleShieldProductScreen.tsx` fue reescrito como una composición de estos nuevos módulos, utilizando `useScrollToSection`.
-*   **Resultado:** Las páginas de productos ahora siguen una arquitectura modular consistente, lo que mejora la mantenibilidad y escalabilidad del código, mientras preserva su diseño y contenido únicos.
 
 ### 01/12/2025 - Implementación de Estrategia Híbrida de Ventas Cruzadas (Cross-Selling)
 

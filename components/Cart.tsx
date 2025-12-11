@@ -14,8 +14,9 @@ export const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
   const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
 
   const subtotal = cartItems.reduce((acc, item) => {
-    const price = typeof item.price === 'string' ? parseFloat(item.price.replace(/\./g, '')) : item.price;
-    return acc + price * item.quantity;
+    const priceAsString = String(item.price || '0');
+    const priceAsNumber = parseFloat(priceAsString.replace(/\./g, ''));
+    return acc + (isNaN(priceAsNumber) ? 0 : priceAsNumber) * item.quantity;
   }, 0);
 
   const handleCheckout = () => {
