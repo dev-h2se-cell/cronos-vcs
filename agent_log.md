@@ -17,6 +17,18 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
 
 ## Historial de Cambios
 
+### 11/12/2025 - Reintegración de Chatbot y Corrección de Error de Formateo de Precios
+
+*   **Contexto:** Se reintegró la funcionalidad completa del chatbot, que no se había confirmado en un commit anterior. Adicionalmente, se corrigió un `TypeError: e.replace is not a function` que ocurría en el carrito de compras.
+*   **Análisis del Problema:**
+    *   **Chatbot:** La implementación completa del chatbot en `api/gemini.ts` y las actualizaciones de `agent_log.md` estaban pendientes de ser confirmadas.
+    *   **Error de Precios:** La función `formatPrice` en `utils/formatPrice.ts` esperaba un `string` pero a veces recibía `null` o `undefined`, causando el error. Además, el cálculo del subtotal en `components/Cart.tsx` no era lo suficientemente robusto.
+*   **Cambios Realizados:**
+    1.  **Reintegración del Chatbot:** Se incluyó la implementación completa del chatbot en `api/gemini.ts` y las entradas correspondientes en `agent_log.md`.
+    2.  **Robustez de `formatPrice`:** Se modificó `utils/formatPrice.ts` para que la función acepte `string | number | null | undefined`, manejando estos tipos de datos de forma segura para evitar el error.
+    3.  **Cálculo Robusto del Subtotal:** Se actualizó la lógica del cálculo del subtotal en `components/Cart.tsx` para asegurar que los precios se parseen correctamente, incluso si provienen de valores inesperados.
+*   **Resultado:** La funcionalidad completa del chatbot está ahora integrada y el error de `TypeError` en el formateo de precios ha sido resuelto, mejorando la estabilidad del carrito.
+
 ### 10/12/2025 - Resolución de Error CSP (`unsafe-eval`)
 
 *   **Contexto:** Se reportó un error de Content Security Policy (CSP) en producción, que bloqueaba el uso de `eval()` y `unsafe-eval`, impidiendo el correcto funcionamiento de scripts.
