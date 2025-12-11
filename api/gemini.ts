@@ -1,8 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export default async function (request: VercelRequest, response: VercelResponse) {
-  console.log('[API-DIAGNÓSTICO] Iniciando listado de modelos.');
+  console.log('[API-DIAGNÓSTICO] Iniciando listado de modelos vía REST.');
 
   const API_KEY = process.env.GEMINI_API_KEY;
   if (!API_KEY) {
@@ -11,17 +10,27 @@ export default async function (request: VercelRequest, response: VercelResponse)
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    // Note: In a real app, you should cache this result, but for diagnostics, we call it directly.
-    const result = await genAI.listModels();
+    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${API_KEY}`;
+    console.log('[API-DIAGNÓSTICO] Realizando fetch a:', url.replace(API_KEY, 'GEMINI_API_KEY_REDACTED'));
 
-    console.log('[API-DIAGNÓSTICO] Modelos encontrados:', JSON.stringify(result, null, 2));
+    const fetchResponse = await fetch(url);
+    const data = await fetchResponse.json();
 
-    // We will return a simplified list of model names for clarity.
-    const modelNames = result.map(m => m.name);
+    if (!fetchResponse.ok) {
+      console.error('[API-DIAGNÓSTICO] Error en la respuesta de la API de Google:', data);
+      return response.status(fetchResponse.status).json({
+        error: 'Error al contactar la API de Google.',
+        details: data,
+      });
+    }
+
+    console.log('[API-DIAGNÓSTICO] Modelos encontrados:', JSON.stringify(data, null, 2));
+
+    // The response contains a 'models' array. We extract the 'name' from each.
+    const modelNames = data.models.map((m: { name: string }) => m.name);
 
     return response.status(200).json({
-      message: 'Modelos disponibles para tu clave de API:',
+      message: 'Modelos disponibles para tu clave de API (vía REST):',
       models: modelNames,
     });
 
@@ -29,11 +38,11 @@ export default async function (request: VercelRequest, response: VercelResponse)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const errorStack = error instanceof Error ? error.stack : 'No stack trace';
 
-    console.error(`[API-DIAGNÓSTICO] Error al listar modelos: ${errorMessage}`);
+    console.error(`[API-DIAGNÓSTICO] Error durante el fetch: ${errorMessage}`);
     console.error(`[API-DIAGNÓSTICO] Stack: ${errorStack}`);
 
     return response.status(500).json({
-      error: 'Error al intentar listar los modelos de la API de Google.',
+      error: 'Error interno al intentar listar los modelos vía REST.',
       details: errorMessage,
     });
   }
