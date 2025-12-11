@@ -17,33 +17,31 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
 
 ## Historial de Cambios
 
+### 11/12/2025 - Implementación de Notificación 'Toast' al Añadir al Carrito
+
+*   **Contexto:** Se identificó una negativa en el focus group: los usuarios no percibían que un producto se había añadido al carrito debido a la falta de feedback visual inmediato.
+*   **Análisis del Problema:** La acción de `addToCart` funcionaba correctamente a nivel lógico, pero no había una confirmación visible en la interfaz de usuario, generando confusión y una mala experiencia.
+*   **Cambios Realizados:**
+    1.  **Creación del Componente `Toast.tsx`:** Se desarrolló un nuevo componente `components/Toast.tsx` para mostrar mensajes emergentes, con un diseño limpio y animaciones fluidas utilizando `framer-motion`.
+    2.  **Integración en `CartContext.tsx`:** Se modificó `context/CartContext.tsx` para gestionar el estado del mensaje `toast` y la lógica para ocultarlo. La función `addToCart` fue actualizada para activar una notificación con el nombre del producto cada vez que un artículo es añadido.
+    3.  **Renderizado en `App.tsx`:** El componente `Toast` fue integrado en `App.tsx` para ser renderizado condicionalmente en el layout principal, asegurando que se superponga correctamente a otros elementos de la UI.
+*   **Resultado:** La aplicación ahora proporciona feedback visual instantáneo a los usuarios al añadir productos al carrito, mejorando significativamente la usabilidad y la percepción de respuesta de la interfaz.
+
 ### 11/12/2025 - Hito del Proyecto: Solución Definitiva del Chatbot de IA
 
 *   **Contexto:** Tras una larga serie de problemas que impedían el funcionamiento del chatbot, se emprendió un proceso de diagnóstico y corrección exhaustivo que culminó en la solución definitiva del problema, marcando un punto de inflexión para el proyecto.
-*   **Análisis del Problema (Iterativo):**
+*   **Análisis del Problema (Iterativo):
     1.  **Error Inicial:** Se reportó un `500 Internal Server Error` en el endpoint `/api/gemini`. El análisis de logs reveló que la causa raíz era un `404 Not Found` de la API de Google, indicando que el modelo configurado (`gemini-1.0-pro`) no estaba disponible para la clave de API del proyecto.
     2.  **Primer Intento de Diagnóstico:** Para identificar los modelos disponibles, se modificó temporalmente la API (`api/gemini.ts`) para usar la función `genAI.listModels()` del SDK de Google.
     3.  **Segundo Error:** Este cambio resultó en un nuevo error: `TypeError: genAI.listModels is not a function`.
     4.  **Causa Raíz:** Se investigó la versión del paquete `@google/generative-ai` en `package.json`, que era `^0.11.0`. Una búsqueda en la documentación confirmó que esta versión del SDK para JavaScript **no incluía el método `listModels()`**.
-*   **Proceso de Solución (Multi-paso):**
+*   **Proceso de Solución (Multi-paso):
     1.  **Diagnóstico Definitivo (vía REST):** Se reescribió el script de diagnóstico en `api/gemini.ts` para que, en lugar de usar el SDK, realizara una llamada directa a la API REST de Google (`https://generativelanguage.googleapis.com/v1beta/models`) usando `fetch`.
     2.  **Éxito del Diagnóstico:** Este método funcionó a la perfección. El usuario pudo interactuar con el endpoint y obtener una respuesta JSON con la lista completa y precisa de todos los modelos de IA disponibles para su clave.
     3.  **Identificación del Modelo Correcto:** De la lista obtenida, se identificó `gemini-2.5-flash` como un modelo potente, disponible y adecuado para la funcionalidad de chatbot.
     4.  **Implementación Final:** Se revirtió el archivo `api/gemini.ts` a su lógica de chatbot completa, pero se actualizó el parámetro del modelo, reemplazando el problemático `gemini-1.0-pro` por el verificado `gemini-2.5-flash`.
     5.  **Commit y Despliegue:** Todos los cambios fueron versionados y subidos al repositorio para su despliegue en Vercel.
 *   **Resultado:** **El chatbot "Calíope" está ahora 100% funcional y operativo en producción.** La solución de este persistente problema de disponibilidad de modelos elimina un obstáculo crítico y permite que la IA interactúe con los usuarios según lo diseñado.
-
-### 11/12/2025 - Reintegración de Chatbot y Corrección de Error de Formateo de Precios
-
-*   **Contexto:** Se reintegró la funcionalidad completa del chatbot, que no se había confirmado en un commit anterior. Adicionalmente, se corrigió un `TypeError: e.replace is not a function` que ocurría en el carrito de compras.
-*   **Análisis del Problema:**
-    *   **Chatbot:** La implementación completa del chatbot en `api/gemini.ts` y las actualizaciones de `agent_log.md` estaban pendientes de ser confirmadas.
-    *   **Error de Precios:** La función `formatPrice` en `utils/formatPrice.ts` esperaba un `string` pero a veces recibía `null` o `undefined`, causando el error. Además, el cálculo del subtotal en `components/Cart.tsx` no era lo suficientemente robusto.
-*   **Cambios Realizados:**
-    1.  **Reintegración del Chatbot:** Se incluyó la implementación completa del chatbot en `api/gemini.ts` y las entradas correspondientes en `agent_log.md`.
-    2.  **Robustez de `formatPrice`:** Se modificó `utils/formatPrice.ts` para que la función acepte `string | number | null | undefined`, manejando estos tipos de datos de forma segura para evitar el error.
-    3.  **Cálculo Robusto del Subtotal:** Se actualizó la lógica del cálculo del subtotal en `components/Cart.tsx` para asegurar que los precios se parseen correctamente, incluso si provienen de valores inesperados.
-*   **Resultado:** La funcionalidad completa del chatbot está ahora integrada y el error de `TypeError` en el formateo de precios ha sido resuelto, mejorando la estabilidad del carrito.
 
 ### 10/12/2025 - Resolución de Error CSP (`unsafe-eval`)
 
@@ -187,7 +185,7 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
     *   El chatbot no funcionaba localmente, a pesar de la expectativa del usuario.
 *   **Cambios Realizados y Resoluciones:**
     1.  **Corrección de Errores de TypeScript (`npx tsc --noEmit`):**
-        *   **`Chatbot.tsx`**: Se actualizaron los tipos `TextPart` e `InlineDataPart` a `Part` debido a una actualización en la librería `@google/genai`.
+        *   **`Chatbot.tsx`**: Se actualizaron los tipos `TextPart` e `InlineDataPart` a `Part` debido a una actualización en la librería `@google/generative-ai`.
         *   **`ChronosProductScreen.tsx`**: Se tipó explícitamente el array `sections` para resolver una asignación de tipo de `string` a uniones literales.
         *   **`vite.config.ts`**: Para resolver una persistente incompatibilidad de tipos entre Vite y Vitest, se tomaron las siguientes medidas:
             *   Se fijaron las versiones de `vite` a `5.1.4` y `vitest` a `4.0.15` en `package.json`.
