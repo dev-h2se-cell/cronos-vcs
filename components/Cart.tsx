@@ -3,15 +3,7 @@ import { X, ShoppingCart, Trash2, Minus, Plus } from 'lucide-react';
 import { Button } from './Button';
 import { useCart } from '../context/CartContext'; // Import useCart
 
-const formatPrice = (price: number | string) => {
-  // Ensure price is a number for formatting
-  const numericPrice = typeof price === 'string' ? parseFloat(price.replace(/\./g, '')) : price;
-  return new Intl.NumberFormat('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    minimumFractionDigits: 0,
-  }).format(numericPrice);
-};
+import { formatPrice } from '../utils/formatPrice';
 
 interface CartProps {
   isOpen: boolean;
