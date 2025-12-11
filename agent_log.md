@@ -17,6 +17,22 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
 
 ## Historial de Cambios
 
+### 11/12/2025 - Hito del Proyecto: Solución Definitiva del Chatbot de IA
+
+*   **Contexto:** Tras una larga serie de problemas que impedían el funcionamiento del chatbot, se emprendió un proceso de diagnóstico y corrección exhaustivo que culminó en la solución definitiva del problema, marcando un punto de inflexión para el proyecto.
+*   **Análisis del Problema (Iterativo):**
+    1.  **Error Inicial:** Se reportó un `500 Internal Server Error` en el endpoint `/api/gemini`. El análisis de logs reveló que la causa raíz era un `404 Not Found` de la API de Google, indicando que el modelo configurado (`gemini-1.0-pro`) no estaba disponible para la clave de API del proyecto.
+    2.  **Primer Intento de Diagnóstico:** Para identificar los modelos disponibles, se modificó temporalmente la API (`api/gemini.ts`) para usar la función `genAI.listModels()` del SDK de Google.
+    3.  **Segundo Error:** Este cambio resultó en un nuevo error: `TypeError: genAI.listModels is not a function`.
+    4.  **Causa Raíz:** Se investigó la versión del paquete `@google/generative-ai` en `package.json`, que era `^0.11.0`. Una búsqueda en la documentación confirmó que esta versión del SDK para JavaScript **no incluía el método `listModels()`**.
+*   **Proceso de Solución (Multi-paso):**
+    1.  **Diagnóstico Definitivo (vía REST):** Se reescribió el script de diagnóstico en `api/gemini.ts` para que, en lugar de usar el SDK, realizara una llamada directa a la API REST de Google (`https://generativelanguage.googleapis.com/v1beta/models`) usando `fetch`.
+    2.  **Éxito del Diagnóstico:** Este método funcionó a la perfección. El usuario pudo interactuar con el endpoint y obtener una respuesta JSON con la lista completa y precisa de todos los modelos de IA disponibles para su clave.
+    3.  **Identificación del Modelo Correcto:** De la lista obtenida, se identificó `gemini-2.5-flash` como un modelo potente, disponible y adecuado para la funcionalidad de chatbot.
+    4.  **Implementación Final:** Se revirtió el archivo `api/gemini.ts` a su lógica de chatbot completa, pero se actualizó el parámetro del modelo, reemplazando el problemático `gemini-1.0-pro` por el verificado `gemini-2.5-flash`.
+    5.  **Commit y Despliegue:** Todos los cambios fueron versionados y subidos al repositorio para su despliegue en Vercel.
+*   **Resultado:** **El chatbot "Calíope" está ahora 100% funcional y operativo en producción.** La solución de este persistente problema de disponibilidad de modelos elimina un obstáculo crítico y permite que la IA interactúe con los usuarios según lo diseñado.
+
 ### 11/12/2025 - Reintegración de Chatbot y Corrección de Error de Formateo de Precios
 
 *   **Contexto:** Se reintegró la funcionalidad completa del chatbot, que no se había confirmado en un commit anterior. Adicionalmente, se corrigió un `TypeError: e.replace is not a function` que ocurría en el carrito de compras.

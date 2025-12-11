@@ -3,7 +3,8 @@ import { Navbar } from './components/Navbar';
 import productsData from './products.json'; // Import the JSON data
 import { ProductData } from './types'; // Import the interface for type safety
 
-const typedProductsData: ProductData = productsData as ProductData; // Type assertion
+// --- Custom Hooks & Context ---
+import { useCart } from './context/CartContext';
 
 // --- Code Splitting: Lazy-load screen components ---
 const ChronosProductScreen = React.lazy(() => import('./components/ChronosProductScreen'));
@@ -18,6 +19,9 @@ import WhatsAppButton from './components/WhatsAppButton';
 import { Footer } from './components/Footer';
 import { Cart } from './components/Cart'; // Import the Cart component
 import Chat from './components/Chat'; // Import the Chatbot component
+import { Toast } from './components/Toast'; // Import the Toast component
+
+const typedProductsData: ProductData = productsData as ProductData; // Type assertion
 
 // View type definition
 type AppView = 'chronos' | 'infinity' | 'hydrolock' | 'shield' | 'protocol' | 'protocols';
@@ -25,6 +29,7 @@ type AppView = 'chronos' | 'infinity' | 'hydrolock' | 'shield' | 'protocol' | 'p
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('chronos');
   const [isCartOpen, setIsCartOpen] = useState(false); // State to control cart visibility
+  const { toastMessage, hideToast } = useCart(); // Get toast state from context
 
   const handleNavigate = (view: AppView) => {
     // Scroll to top when switching views for a fresh feel
@@ -124,10 +129,11 @@ function App() {
       {/* Hide standard Footer on Sales Page */}
       {currentView !== 'protocol' && <Footer />}
 
-      {/* Floating Widgets */}
+      {/* --- Floating Widgets & Global Components --- */}
       <WhatsAppButton />
       <Cart isOpen={isCartOpen} onClose={handleCloseCart} />
       <Chat />
+      {toastMessage && <Toast message={toastMessage} onClose={hideToast} />}
     </div>
   );
 }

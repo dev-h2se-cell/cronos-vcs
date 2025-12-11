@@ -8,10 +8,12 @@ export interface CartItem extends ProductItem {
 
 interface CartState {
   cartItems: CartItem[];
+  toastMessage: string | null;
   addToCart: (item: ProductItem | ProtocolItem, quantity: number) => void;
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, newQuantity: number) => void;
   clearCart: () => void;
+  hideToast: () => void;
 }
 
 // --- Context ---
@@ -24,6 +26,7 @@ interface CartProviderProps {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const addToCart = (item: ProductItem | ProtocolItem, quantity: number) => {
     setCartItems(prevItems => {
@@ -37,6 +40,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       // Add new item
       return [...prevItems, { ...(item as ProductItem), quantity }]; // We assert as ProductItem for simplicity, assuming common fields.
     });
+    setToastMessage(`"${item.name}" añadido al carrito`);
   };
 
   const removeFromCart = (itemId: string) => {
@@ -59,8 +63,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setCartItems([]);
   };
 
+  const hideToast = () => {
+    setToastMessage(null);
+  };
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, clearCart }}>
+    <CartContext.Provider value={{ cartItems, toastMessage, addToCart, removeFromCart, updateQuantity, clearCart, hideToast }}>
       {children}
     </CartContext.Provider>
   );
