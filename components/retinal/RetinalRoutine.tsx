@@ -7,18 +7,17 @@ interface Props {
 
 export const RetinalRoutine: React.FC<Props> = ({ productsData }) => {
   const retinalProduct = productsData.products.find(p => p.id === 'infinity-retinal');
-  const chronosCProduct = productsData.products.find(p => p.id === 'chronos-c-shield');
   const invisibleShieldProduct = productsData.products.find(p => p.id === 'invisible-shield-spf');
 
 
-  if (!retinalProduct || !chronosCProduct || !invisibleShieldProduct) {
+  if (!retinalProduct || !invisibleShieldProduct) {
     return <div>Error: Retinal product data not found.</div>;
   }
 
   const routineSteps = [
     { title: 'Noches 1-2', action: 'Tratamiento', desc: `Aplica ${retinalProduct.name} sobre piel limpia y seca.` },
     { title: 'Noches 3-4', action: 'Recuperación', desc: 'Solo hidratación y descanso.' },
-    { title: 'Mañanas', action: 'Protección', desc: `Siempre usa ${chronosCProduct.name} y ${invisibleShieldProduct.name}.` }
+    { title: 'Mañanas', action: 'Protección', desc: `Siempre usa ${invisibleShieldProduct.name} para una protección solar completa.` }
   ];
 
   return (

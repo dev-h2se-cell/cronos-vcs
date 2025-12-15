@@ -8,7 +8,7 @@ export const Usage: React.FC = () => {
         <div className="text-center mb-16">
           <span className="text-orange-600 font-bold tracking-widest text-xs uppercase mb-2 block">El Ritual Diario</span>
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Cómo Maximizar la Absorción</h2>
-          <p className="text-slate-600">Sigue este protocolo cada mañana para garantizar 24 horas de protección antioxidante.</p>
+          <p className="text-slate-600">Sigue este protocolo cada noche para una reparación antioxidante profunda mientras duermes.</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 relative">

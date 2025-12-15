@@ -1,6 +1,6 @@
 import React, { useState, Suspense } from 'react';
 import { Navbar } from './components/Navbar';
-import productsData from './products.json'; // Import the JSON data
+import productsData from './bot_config/knowledge/products.json'; // Import the JSON data
 import { ProductData } from './types'; // Import the interface for type safety
 
 // --- Custom Hooks & Context ---

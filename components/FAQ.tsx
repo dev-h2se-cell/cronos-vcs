@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { FAQItem } from '../types';
-import faqData from '../faq.json';
+import faqData from '../bot_config/knowledge/faq.json';
 
 const faqs: FAQItem[] = faqData.faqs;
 
