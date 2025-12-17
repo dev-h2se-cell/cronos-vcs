@@ -11,7 +11,7 @@ export const SocialProof: React.FC = () => {
         </div>
 
         {/* Replaced with YouTube Embed */}
-        <YouTubeEmbed videoId="LEbuSlTQSaM" title="Demostración del Test de la Manzana Chronos-C Shield" />
+        <YouTubeEmbed videoId="FLa8WvwJBVo" title="Demostración del Test de la Manzana Chronos-C Shield" />
 
         <div className="mt-8 text-center text-sm text-slate-400">
             *Prueba realizada en ambiente controlado a 25°C durante 24 horas.
