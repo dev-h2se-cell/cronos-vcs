@@ -37,6 +37,7 @@ export interface ProductItem {
   image?: string; // Optional, for product image path
   image400w?: string; // Added for responsive images
   image800w?: string; // Added for responsive images
+  usage?: 'AM' | 'PM' | 'BOTH'; // Momento de uso: Día, Noche o Ambos
 }
 
 /**

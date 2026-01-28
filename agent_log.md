@@ -316,3 +316,19 @@ Este archivo es un registro interno para mí, el agente Gemini. Lo uso para docu
     2.  **Configuración de Vite y TS:** Actualización de `vite.config.ts` para manejar alias y fix de rutas de `setupFiles` para Vitest. Ajuste de `tsconfig.json` para incluir los nuevos paths.
     3.  **Limpieza:** Eliminación de bloques de texto erróneos en archivos de configuración detectados durante el build.
 *   **Resultado:** El proyecto mantiene su funcionalidad completa (incluyendo tests unitarios) bajo la nueva estructura organizada.
+### 28/01/2026 - Despliegue de Alpha Shop & Revamp de UX
+
+*   **Contexto:** Evolución mayor del frontend para integrar la estrategia "Alpha Stack". Se requería una landing híbrida (Routine Builder + Kits Expertos) y un sistema de gamificación de descuentos para aumentar el AOV, además de mejoras críticas en la UX de compra.
+*   **Cambios Realizados:**
+    1.  **Nueva Landing (`ShopScreen.tsx`):**
+        *   Implementación de "Routine Builder" interactivo con barra de progreso gamificada.
+        *   Sección de "Expert Kits" integrada.
+    2.  **Motor de Precios Dinámico (`Alpha Matrix`):**
+        *   Reglas: 2 items (10%), Sinergia AM+PM (15%), Trío (25%), Alpha (35%).
+        *   Lógica centralizada en `productService.ts`.
+    3.  **UX de Carrito:**
+        *   **Auto-Open:** El carrito se abre automáticamente al agregar una rutina.
+        *   **Floating Prompt:** Nueva píldora flotante (`FloatingCartPrompt.tsx`) que aparece cuando el carrito tiene items y está cerrado, mostrando total y CTA.
+        *   Corrección de bug `NaN` asegurando cantidad explícita en `addToCart`.
+    4.  **Deep Linking:** Soporte para parámetros URL (`?view=shop`, `?mode=builder`) para optimización de campañas de Meta Ads.
+*   **Resultado:** Plataforma lista para tráfico pagado con una experiencia de usuario optimizada para conversión y ticket alto.
