@@ -17,15 +17,25 @@ export const productService = {
             return [];
         }
 
-        return data.map((item: any) => {
-            let mappedId = String(item.id);
-            const nameLower = item.name.toLowerCase();
-
+        const mapped = (data || []).map((item: any) => {
             // Mapeo Maestro de IDs para compatibilidad con UI Cronos
-            if (nameLower.includes('vitamina c')) mappedId = 'chronos-c-shield';
-            else if (nameLower.includes('retin')) mappedId = 'infinity-retinal';
-            else if (nameLower.includes('hydrolock') || nameLower.includes('hialurónico')) mappedId = 'hydro-lock-serum';
-            else if (nameLower.includes('shield') || nameLower.includes('protector')) mappedId = 'invisible-shield-spf';
+            const nameLower = item.name.toLowerCase();
+            let mappedId = String(item.id);
+            let defaultBenefits: string[] = [];
+
+            if (nameLower.includes('vitamina c')) {
+                mappedId = 'chronos-c-shield';
+                defaultBenefits = ['Estabilidad Total', 'Luminosidad', 'Antioxidante'];
+            } else if (nameLower.includes('retin')) {
+                mappedId = 'infinity-retinal';
+                defaultBenefits = ['Regeneración', 'Cero Irritación', 'Alta Potencia'];
+            } else if (nameLower.includes('hydro') || nameLower.includes('hialur')) {
+                mappedId = 'hydro-lock-serum';
+                defaultBenefits = ['Hidratación 5D', 'Absorción 5s', 'Zero-Pilling'];
+            } else if (nameLower.includes('shield') || nameLower.includes('protector')) {
+                mappedId = 'invisible-shield-spf';
+                defaultBenefits = ['SPF 50+', 'Filtro Híbrido', 'Toque Seco'];
+            }
 
             return {
                 id: mappedId,
@@ -36,13 +46,16 @@ export const productService = {
                 currency: 'COP',
                 description: item.description || '',
                 longDescription: item.description || '',
-                benefits: item.active_ingredients || [],
+                benefits: (item.active_ingredients && item.active_ingredients.length > 0) ? item.active_ingredients : defaultBenefits,
                 size: '50ml',
                 image: item.image_url || 'https://placehold.co/800x800/slate/white?text=Cronos+Product',
                 image400w: item.image_url || 'https://placehold.co/400x400/slate/white?text=Cronos+Product',
                 image800w: item.image_url || 'https://placehold.co/800x800/slate/white?text=Cronos+Product'
             };
         }) as ProductItem[];
+
+        console.log('[ProductService] Mapped Products:', mapped.map(p => ({ id: p.id, name: p.name })));
+        return mapped;
     },
 
     /**
