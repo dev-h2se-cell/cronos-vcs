@@ -1,7 +1,8 @@
 import React, { useState, Suspense } from 'react';
 import { Navbar } from './components/Navbar';
-import productsData from './bot_config/knowledge/products.json'; // Import the JSON data
 import { ProductData } from './types'; // Import the interface for type safety
+import { productService } from './services/productService'; // Import the dynamic service
+import { useEffect } from 'react';
 
 // --- Custom Hooks & Context ---
 import { useCart } from './context/CartContext';
@@ -21,15 +22,35 @@ import { Cart } from './components/Cart'; // Import the Cart component
 import Chat from './components/Chat'; // Import the Chatbot component
 import { Toast } from './components/Toast'; // Import the Toast component
 
-const typedProductsData: ProductData = productsData as ProductData; // Type assertion
-
 // View type definition
 type AppView = 'chronos' | 'infinity' | 'hydrolock' | 'shield' | 'protocol' | 'protocols';
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('chronos');
   const [isCartOpen, setIsCartOpen] = useState(false); // State to control cart visibility
+  const [dynamicProductsData, setDynamicProductsData] = useState<ProductData>({ products: [], protocols: [], others: [] });
   const { toastMessage, hideToast } = useCart(); // Get toast state from context
+
+  useEffect(() => {
+    async function loadMasterData() {
+      try {
+        const products = await productService.getProducts();
+        const protocols = await productService.getProtocols(products);
+        const others = await productService.getOthers();
+
+        setDynamicProductsData({
+          products,
+          protocols,
+          others
+        });
+      } catch (error) {
+        console.error("Error loading master data into Cronos:", error);
+      } finally {
+        // Nada extra por ahora
+      }
+    }
+    loadMasterData();
+  }, []);
 
   const handleNavigate = (view: AppView) => {
     // Scroll to top when switching views for a fresh feel
@@ -49,77 +70,80 @@ function App() {
   const renderContent = () => {
     if (currentView === 'protocols') {
       return (
-        <ProtocolsScreen 
-          productsData={typedProductsData}
+        <ProtocolsScreen
+          productsData={dynamicProductsData}
         />
       );
     }
 
     if (currentView === 'protocol') {
       return (
-        <LongevityProtocolScreen 
+        <LongevityProtocolScreen
           onBack={() => setCurrentView('chronos')}
-          productsData={typedProductsData}
+          productsData={dynamicProductsData}
         />
       );
     }
 
     if (currentView === 'infinity') {
       return (
-        <RetinalProductPage 
-          onNavigateToProtocol={() => handleNavigate('protocol')} 
+        <RetinalProductPage
+          onAddToCart={handleOpenCart}
+          onNavigateToProtocol={() => handleNavigate('protocol')}
           onNavigateToProtocols={() => handleNavigate('protocols')}
-          productsData={typedProductsData}
+          productsData={dynamicProductsData}
         />
       );
     }
 
     if (currentView === 'hydrolock') {
       return (
-        <HydroLockProductScreen 
+        <HydroLockProductScreen
+          onAddToCart={handleOpenCart}
           onNavigateToProtocols={() => handleNavigate('protocols')}
-          productsData={typedProductsData}
+          productsData={dynamicProductsData}
         />
       );
     }
 
     if (currentView === 'shield') {
       return (
-        <InvisibleShieldProductScreen 
+        <InvisibleShieldProductScreen
+          onAddToCart={handleOpenCart}
           onNavigateToProtocols={() => handleNavigate('protocols')}
-          productsData={typedProductsData}
+          productsData={dynamicProductsData}
         />
       );
     }
 
     // Default: Chronos View (Unified Screen)
     return (
-      <ChronosProductScreen 
+      <ChronosProductScreen
         onNavigateToProtocol={() => handleNavigate('protocol')}
-        productsData={typedProductsData}
+        productsData={dynamicProductsData}
       />
     );
   };
 
   const getNavbarView = () => {
-     if (currentView === 'infinity') return 'infinity';
-     if (currentView === 'hydrolock') return 'hydrolock';
-     if (currentView === 'shield') return 'shield';
-     return 'chronos';
+    if (currentView === 'infinity') return 'infinity';
+    if (currentView === 'hydrolock') return 'hydrolock';
+    if (currentView === 'shield') return 'shield';
+    return 'chronos';
   };
 
   return (
     <div className={`min-h-screen flex flex-col font-sans ${currentView === 'protocol' ? 'bg-slate-950' : 'bg-slate-50'}`}>
-      
+
       {/* Hide standard Navbar on the Sales Page to reduce distractions, or show customized version */}
       {currentView !== 'protocol' && (
-        <Navbar 
+        <Navbar
           currentView={getNavbarView()}
           onNavigate={(view) => handleNavigate(view)}
           onOpenCart={handleOpenCart}
         />
       )}
-      
+
       <main className="flex-grow">
         <Suspense fallback={<div className="w-full h-screen flex items-center justify-center bg-slate-50"><p className="text-slate-500">Cargando...</p></div>}>
           {renderContent()}

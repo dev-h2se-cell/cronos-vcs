@@ -2,6 +2,10 @@
   "name": "chronos-c-shield",
   "version": "1.0.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dev-h2se-cell/cronos-vcs"
+  },
   "scripts": {
     "dev": "vite",
     "vercel-dev": "vercel dev",
@@ -15,7 +19,9 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.11.0",
+    "@supabase/supabase-js": "^2.93.2",
     "@vercel/node": "^2.3.0",
+    "dotenv": "^17.2.3",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",

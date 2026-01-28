@@ -1,5 +1,10 @@
 {
   "buildCommand": "vite build",
   "outputDirectory": "dist",
+  "functions": {
+    "api/gemini.ts": {
+      "includeFiles": "bot_config/**"
+    }
+  },
   "framework": "vite"
 }
