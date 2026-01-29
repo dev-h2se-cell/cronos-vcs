@@ -68,7 +68,8 @@ export default async function (request: VercelRequest, response: VercelResponse)
     const data = await googleRes.json();
     const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No tengo respuesta para eso.";
 
-    return response.status(200).json({ text: reply });
+    // Return Plain Text to match frontend stream expectations
+    return response.status(200).send(reply);
 
   } catch (error: any) {
     console.error('[CRONOS API CRASH]:', error);
