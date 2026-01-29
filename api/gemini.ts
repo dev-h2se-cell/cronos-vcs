@@ -87,7 +87,7 @@ export default async function (request: VercelRequest, response: VercelResponse)
     // 5. Configurar Modelo
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-1.5-flash-001',
       systemInstruction: {
         role: "model",
         parts: [{ text: systemPrompt + "\n\n--- MASTER DATA (CONTEXTO DINÁMICO) ---" + "\n\n" + knowledgeBase }]
